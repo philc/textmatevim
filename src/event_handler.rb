@@ -16,17 +16,20 @@ class EventHandler
   def handle_key_message(message)
     message = JSON.parse(message)
     keystroke = KeyStroke.from_character_and_modifier_flags(message["characters"], message["modifierFlags"])
+
+    if @current_mode == "insert"
+      if keystroke.to_s == "escape"
+        @current_mode = "command"
+        return ["enterCommandMode"]
+      else
+        return []
+      end
+    end
+
     result = case keystroke.to_s
       when "i"
         @current_mode = "insert"
         ["enterInsertMode"]
-      when "escape"
-        if @current_mode == "insert"
-          @current_mode = "command"
-          ["enterCommandMode"]
-        else
-          []
-        end
       when "h": ["moveBackward:"]
       when "l": ["moveForward:"]
       when "j": ["moveDown:"]
