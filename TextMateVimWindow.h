@@ -4,8 +4,9 @@
 }
 
 + (BOOL)isValidWindowType:(NSWindow *)theWindow;
-/*- (int)startEventRouter;*/
 - (void)sendEvent:(NSEvent *)theEvent;
+- (void)enterCommandMode;
+- (void)enterInsertMode;
 
 
 @end

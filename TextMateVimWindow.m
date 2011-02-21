@@ -10,6 +10,7 @@
 
 static TextMateVimWindow * currentWindow;
 static CommandModeCursor * cursorView;
+static NSString * currentMode;
 
 + (BOOL)isValidWindowType:(NSWindow *)window {
   return [[window firstResponder] isKindOfClass:NSClassFromString(@"OakTextView")];
@@ -25,14 +26,13 @@ static CommandModeCursor * cursorView;
   if (self != currentWindow) {
     currentWindow = self;
     id responder = [self firstResponder];
+    currentMode = currentMode ? currentMode : @"insert";
     if (cursorView)
       [cursorView removeFromSuperview];
     cursorView = [[CommandModeCursor alloc] initWithFrame:[responder bounds]];
     [responder addSubview:cursorView];
-    [cursorView setMode:@"command"];
+    [cursorView setMode:currentMode];
   }
-
-  // TODO(philc): When changing modes, update the cursor view.
 
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
       event.charactersIgnoringModifiers, @"characters",
@@ -51,11 +51,32 @@ static CommandModeCursor * cursorView;
 
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
   if (commands.count > 0) {
-    for (int i = 0; i < commands.count; i++)
-      [[self firstResponder] performSelector: NSSelectorFromString([commands objectAtIndex:i])
-          withObject: self];
+    for (int i = 0; i < commands.count; i++) {
+      NSString * command = [commands objectAtIndex:i];
+      NSLog(@"%@", command);
+      if ([command isEqualToString: @"enterCommandMode"])
+        [self enterCommandMode];
+      else if ([command isEqualToString: @"enterInsertMode"])
+        [self enterInsertMode];
+      else
+        // Pass the command on to Textmate's OakTextView.
+        [[self firstResponder] performSelector: NSSelectorFromString(command) withObject: self];
+    }
   } else {
     [super sendEvent: event];
   }
 }
+
+- (void)enterCommandMode {
+  currentMode = @"command";
+  if (cursorView)
+    [cursorView setMode:currentMode];
+}
+
+- (void)enterInsertMode {
+  currentMode = @"insert";
+  if (cursorView)
+    [cursorView setMode:currentMode];
+}
+
 @end

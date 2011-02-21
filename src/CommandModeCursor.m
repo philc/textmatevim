@@ -7,6 +7,8 @@
   self = [super initWithFrame:frame];
   if (self)
     [self setCaretColor: [[NSColor grayColor] colorWithAlphaComponent:0.5]];
+  
+  mode = @"insert";
   return self;
 }
 
