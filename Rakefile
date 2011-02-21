@@ -1,0 +1,47 @@
+require 'pathname'
+
+APPNAME = "TextMateVim"
+DEV_TEXTMATE = ENV["DevTextMate"] || "/Applications/DevTextMate.app/Contents/MacOS/DevTextMate"
+CONFIGURATION = ENV['Configuration'] || 'Debug'
+
+task :default => :test
+task :run => :build
+
+task :build do
+  # Textmate is currently built against i386, and so must our plugin be.
+  puts `xcodebuild -configuration #{CONFIGURATION} ARCHS="i386"`
+end
+
+task :run do
+  exec "build/Debug/textmatevim.app/Contents/MacOS/textmatevim"
+end
+
+task :test do |task|
+  Dir.glob("test/*_test.rb").each do |filename|
+    puts `ruby #{filename}`
+  end
+end
+
+# We open this file in textmate to play around with the editing features of our plugin.
+SAMPLE_FILE = <<FILE
+This is a test file.
+Second line of that file.
+FILE
+
+desc "Launches a development version of textmate, with TextMateVim active"
+task :launch do
+  kill_process(DEV_TEXTMATE)
+  output_path = File.expand_path("build/Debug/#{APPNAME}.bundle")
+
+  symlink_target = File.expand_path(
+      "~/Library/Application Support/DevTextMate/PlugIns/TextMateVimPlugin.tmplugin")
+  `rm -Rf '#{symlink_target}'` if File.exists?(symlink_target)
+  `ln -fs #{output_path} '#{symlink_target}'`
+  File.open("/tmp/sample_file", "w") { |file| file.write(SAMPLE_FILE) }
+  `#{DEV_TEXTMATE} /tmp/sample_file`
+end
+
+def kill_process(name)
+  pid = `ps ax | grep #{name} | grep -v grep`.split(" ")[0]
+  `kill -9 #{pid}` if pid
+end
