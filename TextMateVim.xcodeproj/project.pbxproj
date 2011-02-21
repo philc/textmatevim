@@ -12,6 +12,8 @@
 		0A77BEB3111FFA4D006F0625 /* RubyCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */; };
 		6ABA33E6131216A60029DE19 /* event_handler.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABA33E4131216A60029DE19 /* event_handler.rb */; };
 		6ABA33E7131216A60029DE19 /* keystroke.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABA33E5131216A60029DE19 /* keystroke.rb */; };
+		6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33E9131250B80029DE19 /* CommandModeCursor.m */; };
+		6ABA33EE131251490029DE19 /* NSColor_categories.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33ED131251490029DE19 /* NSColor_categories.m */; };
 		6ADFAD111311DF80009113FB /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ADFAD101311DF80009113FB /* JSON.framework */; };
 		6ADFAD3213120125009113FB /* TextMateVimWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADFAD3113120125009113FB /* TextMateVimWindow.m */; };
 		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
@@ -27,6 +29,10 @@
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		6ABA33E4131216A60029DE19 /* event_handler.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = event_handler.rb; sourceTree = "<group>"; };
 		6ABA33E5131216A60029DE19 /* keystroke.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = keystroke.rb; sourceTree = "<group>"; };
+		6ABA33E8131250B80029DE19 /* CommandModeCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandModeCursor.h; path = src/CommandModeCursor.h; sourceTree = "<group>"; };
+		6ABA33E9131250B80029DE19 /* CommandModeCursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommandModeCursor.m; path = src/CommandModeCursor.m; sourceTree = "<group>"; };
+		6ABA33EC131251490029DE19 /* NSColor_categories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColor_categories.h; sourceTree = "<group>"; };
+		6ABA33ED131251490029DE19 /* NSColor_categories.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColor_categories.m; sourceTree = "<group>"; };
 		6ADFAD101311DF80009113FB /* JSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JSON.framework; path = Library/Frameworks/JSON.framework; sourceTree = SDKROOT; };
 		6ADFAD3013120125009113FB /* TextMateVimWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextMateVimWindow.h; sourceTree = "<group>"; };
 		6ADFAD3113120125009113FB /* TextMateVimWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextMateVimWindow.m; sourceTree = "<group>"; };
@@ -84,6 +90,9 @@
 		08FB77AFFE84173DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				6ABA33EB131251490029DE19 /* lib */,
+				6ABA33E8131250B80029DE19 /* CommandModeCursor.h */,
+				6ABA33E9131250B80029DE19 /* CommandModeCursor.m */,
 				6ADFAD3013120125009113FB /* TextMateVimWindow.h */,
 				6ADFAD3113120125009113FB /* TextMateVimWindow.m */,
 				0A77BE79111FF36C006F0625 /* TextMateVimPlugin.h */,
@@ -107,6 +116,15 @@
 				6ABA33E5131216A60029DE19 /* keystroke.rb */,
 			);
 			path = src;
+			sourceTree = "<group>";
+		};
+		6ABA33EB131251490029DE19 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				6ABA33EC131251490029DE19 /* NSColor_categories.h */,
+				6ABA33ED131251490029DE19 /* NSColor_categories.m */,
+			);
+			path = lib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -174,6 +192,8 @@
 			files = (
 				0A77BE7B111FF36C006F0625 /* TextMateVimPlugin.m in Sources */,
 				6ADFAD3213120125009113FB /* TextMateVimWindow.m in Sources */,
+				6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */,
+				6ABA33EE131251490029DE19 /* NSColor_categories.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

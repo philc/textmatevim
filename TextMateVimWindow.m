@@ -3,9 +3,13 @@
  */
 #import "TextMateVimWindow.h"
 #import "TextMateVimPlugin.h"
+#import "CommandModeCursor.h"
 #import <JSON/JSON.h>
 
 @implementation TextMateVimWindow
+
+static TextMateVimWindow * currentWindow;
+static CommandModeCursor * cursorView;
 
 + (BOOL)isValidWindowType:(NSWindow *)window {
   return [[window firstResponder] isKindOfClass:NSClassFromString(@"OakTextView")];
@@ -16,6 +20,19 @@
     [super sendEvent:event];
     return;
   }
+
+  // If we've just changed windows, make sure that our cursor is being rendered in the current window.
+  if (self != currentWindow) {
+    currentWindow = self;
+    id responder = [self firstResponder];
+    if (cursorView)
+      [cursorView removeFromSuperview];
+    cursorView = [[CommandModeCursor alloc] initWithFrame:[responder bounds]];
+    [responder addSubview:cursorView];
+    [cursorView setMode:@"command"];
+  }
+
+  // TODO(philc): When changing modes, update the cursor view.
 
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
       event.charactersIgnoringModifiers, @"characters",
@@ -41,9 +58,4 @@
     [super sendEvent: event];
   }
 }
-
-- (void)go {
-  NSLog(@"%@", @"executing go method!");
-}
-
 @end
