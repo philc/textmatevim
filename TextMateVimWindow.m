@@ -1,7 +1,6 @@
 /*
- * Using the JSON framework: http://stig.github.com/json-framework/
+ * We're using this JSON framework: http://stig.github.com/json-framework/
  */
-
 #import "TextMateVimWindow.h"
 #import "TextMateVimPlugin.h"
 #import <JSON/JSON.h>
@@ -13,13 +12,13 @@
 }
 
 - (void)sendEvent:(NSEvent *)event {
-  if ([event type] != NSKeyDown) {
+  if (![TextMateVimWindow isValidWindowType:self] || [event type] != NSKeyDown) {
     [super sendEvent:event];
     return;
   }
 
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-      event.charactersIgnoringModifiers, @"charactersIgnoringModifiers",
+      event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
       nil];
   fputs([[dict JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
@@ -33,12 +32,14 @@
     return;
   }
 
-  NSDictionary *commandStack = [[NSString stringWithUTF8String: response] JSONValue];
-  NSString * method = [commandStack objectForKey: @"method"];
-  NSLog(@"%@", method);
-  [self performSelector: NSSelectorFromString(method)];
-
-  [super sendEvent: event];
+  NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
+  if (commands.count > 0) {
+    for (int i = 0; i < commands.count; i++)
+      [[self firstResponder] performSelector: NSSelectorFromString([commands objectAtIndex:i])
+          withObject: self];
+  } else {
+    [super sendEvent: event];
+  }
 }
 
 - (void)go {

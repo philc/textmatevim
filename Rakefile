@@ -23,12 +23,10 @@ task :test do |task|
 end
 
 # We open this file in textmate to play around with the editing features of our plugin.
-SAMPLE_FILE = <<FILE
-This is a test file.
-Second line of that file.
-FILE
+SAMPLE_FILE = "My baloney has a first name, it's HOMER\n" * 20
 
 desc "Launches a development version of textmate, with TextMateVim active"
+task :launch => :build
 task :launch do
   kill_process(DEV_TEXTMATE)
   output_path = File.expand_path("build/Debug/#{APPNAME}.bundle")
