@@ -34,6 +34,16 @@ class EventHandler
       when "l": ["moveForward:"]
       when "j": ["moveDown:"]
       when "k": ["moveUp:"]
+
+      when "b": ["moveWordBackward:"]
+      when "w": ["moveWordForward:"]
+      when "e": ["moveToEndOfWord:"]
+
+      when "0": ["moveToBeginningOfLine:"]
+      when "$": ["moveToEndOfLine:"]
+
+      when "G": ["moveToEndOfDocument:"]
+
       when "ctrl+d": ["moveDown:"] * 6
       when "ctrl+u": ["moveUp:"] * 6
     else

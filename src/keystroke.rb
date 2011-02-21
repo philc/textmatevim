@@ -105,21 +105,24 @@ class KeyStroke
   def to_s
     parts = []
 
-    # This is a bit strange: we can have modifier keypresses, like CMD keydown, where the cocoa modifier
-    # flags do not indicate that CMD is pressed, and yet the keycode indicates it's CMD.
-    # In this case, make the keystroke be simply "cmd"+"a", because cocoa send us modifier keystrokes with
-    # a keycode of "0", which means "a". The two keystrokes CMD+A and CMD are indistinguishable from
-    # each other (when dispatched by Cocoa).
     if key
-      # if is_modifier?
-      #   parts = [translate_to_modifier(key), "a"]
-      # else
+      if is_modifier?
+        parts = [translate_to_modifier(key)]
+      else
         parts = modifiers.dup
         # inspect will properly escape characters like "\t", but it will include "" around
         # the key. Remove them.
         escaped = key.inspect[1..-2]
         parts.push(@@key_to_readable[key] || escaped)
-      # end
+
+        # When shift is used with a regular character, like shift+g, just translate that to "G".
+        # When shift is used with a non-regular character, leave it on (e.g. shift+UP)
+        # Instead of returning "shift+g", 
+        if (parts.include?("shift") && escaped.downcase != escaped.upcase)
+          parts.delete("shift")
+          parts[-1] = parts.last.upcase
+        end
+      end
     else
       parts = modifiers.dup
     end
