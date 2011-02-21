@@ -16,13 +16,14 @@ class KeyStroke
   HelpKeyMask       = 1 << 22
   FunctionKeyMask   = 1 << 23
 
-  @@readable_char_map = {
+  @@readable_to_key = {
     "enter" => "\r",
     "tab" => "\t",
     "space" => " ",
     "escape" => "\e",
     "backspace" => "\b"
   }
+  @@key_to_readable = @@readable_to_key.invert
 
   MODIFIER_MAP = {
     "cmd" => CommandKeyMask,
@@ -49,7 +50,7 @@ class KeyStroke
     keystroke = KeyStroke.new
     parts = keystroke_string.downcase.split("+")
     keystroke.key = parts.last
-    keystroke.key = @@readable_char_map[keystroke.key] if @@readable_char_map[keystroke.key]
+    keystroke.key = @@readable_to_key[keystroke.key] if @@readable_to_key[keystroke.key]
     if parts.size > 1
       keystroke.modifiers = parts[0..-2]
     end
@@ -116,7 +117,8 @@ class KeyStroke
         parts = modifiers.dup
         # inspect will properly escape characters like "\t", but it will include "" around
         # the key. Remove them.
-        parts.push(key.inspect[1..-2])
+        escaped = key.inspect[1..-2]
+        parts.push(@@key_to_readable[key] || escaped)
       # end
     else
       parts = modifiers.dup
