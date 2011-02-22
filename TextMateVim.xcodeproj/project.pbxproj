@@ -10,10 +10,12 @@
 		0A77BE7B111FF36C006F0625 /* TextMateVimPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A77BE7A111FF36C006F0625 /* TextMateVimPlugin.m */; };
 		0A77BE8F111FF5B2006F0625 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BE8E111FF5B2006F0625 /* Cocoa.framework */; };
 		0A77BEB3111FFA4D006F0625 /* RubyCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */; };
-		6ABA33E6131216A60029DE19 /* event_handler.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABA33E4131216A60029DE19 /* event_handler.rb */; };
-		6ABA33E7131216A60029DE19 /* keystroke.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABA33E5131216A60029DE19 /* keystroke.rb */; };
 		6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33E9131250B80029DE19 /* CommandModeCursor.m */; };
 		6ABA33EE131251490029DE19 /* NSColor_categories.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33ED131251490029DE19 /* NSColor_categories.m */; };
+		6ABE410D1313B263001CA6B4 /* default_config.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE41081313B263001CA6B4 /* default_config.rb */; };
+		6ABE410E1313B263001CA6B4 /* event_handler.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE41091313B263001CA6B4 /* event_handler.rb */; };
+		6ABE410F1313B263001CA6B4 /* keymap.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE410A1313B263001CA6B4 /* keymap.rb */; };
+		6ABE41101313B263001CA6B4 /* keystroke.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE410B1313B263001CA6B4 /* keystroke.rb */; };
 		6ADFAD111311DF80009113FB /* JSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ADFAD101311DF80009113FB /* JSON.framework */; };
 		6ADFAD3213120125009113FB /* TextMateVimWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADFAD3113120125009113FB /* TextMateVimWindow.m */; };
 		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
@@ -27,12 +29,14 @@
 		0A77BE8E111FF5B2006F0625 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RubyCocoa.framework; path = System/Library/Frameworks/RubyCocoa.framework; sourceTree = SDKROOT; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
-		6ABA33E4131216A60029DE19 /* event_handler.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = event_handler.rb; sourceTree = "<group>"; };
-		6ABA33E5131216A60029DE19 /* keystroke.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = keystroke.rb; sourceTree = "<group>"; };
 		6ABA33E8131250B80029DE19 /* CommandModeCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandModeCursor.h; path = src/CommandModeCursor.h; sourceTree = "<group>"; };
 		6ABA33E9131250B80029DE19 /* CommandModeCursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommandModeCursor.m; path = src/CommandModeCursor.m; sourceTree = "<group>"; };
 		6ABA33EC131251490029DE19 /* NSColor_categories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColor_categories.h; sourceTree = "<group>"; };
 		6ABA33ED131251490029DE19 /* NSColor_categories.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColor_categories.m; sourceTree = "<group>"; };
+		6ABE41081313B263001CA6B4 /* default_config.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = default_config.rb; sourceTree = "<group>"; };
+		6ABE41091313B263001CA6B4 /* event_handler.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = event_handler.rb; sourceTree = "<group>"; };
+		6ABE410A1313B263001CA6B4 /* keymap.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = keymap.rb; sourceTree = "<group>"; };
+		6ABE410B1313B263001CA6B4 /* keystroke.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = keystroke.rb; sourceTree = "<group>"; };
 		6ADFAD101311DF80009113FB /* JSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JSON.framework; path = Library/Frameworks/JSON.framework; sourceTree = SDKROOT; };
 		6ADFAD3013120125009113FB /* TextMateVimWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextMateVimWindow.h; sourceTree = "<group>"; };
 		6ADFAD3113120125009113FB /* TextMateVimWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextMateVimWindow.m; sourceTree = "<group>"; };
@@ -80,7 +84,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6ABA33E3131216A60029DE19 /* src */,
+				6ABE41051313B263001CA6B4 /* src */,
 				8D576317048677EA00EA77CD /* Info.plist */,
 				8D5B49A704867FD3000E48DA /* InfoPlist.strings */,
 			);
@@ -109,15 +113,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6ABA33E3131216A60029DE19 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				6ABA33E4131216A60029DE19 /* event_handler.rb */,
-				6ABA33E5131216A60029DE19 /* keystroke.rb */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
 		6ABA33EB131251490029DE19 /* lib */ = {
 			isa = PBXGroup;
 			children = (
@@ -125,6 +120,17 @@
 				6ABA33ED131251490029DE19 /* NSColor_categories.m */,
 			);
 			path = lib;
+			sourceTree = "<group>";
+		};
+		6ABE41051313B263001CA6B4 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6ABE41081313B263001CA6B4 /* default_config.rb */,
+				6ABE41091313B263001CA6B4 /* event_handler.rb */,
+				6ABE410A1313B263001CA6B4 /* keymap.rb */,
+				6ABE410B1313B263001CA6B4 /* keystroke.rb */,
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -178,8 +184,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5B49A804867FD3000E48DA /* InfoPlist.strings in Resources */,
-				6ABA33E6131216A60029DE19 /* event_handler.rb in Resources */,
-				6ABA33E7131216A60029DE19 /* keystroke.rb in Resources */,
+				6ABE410D1313B263001CA6B4 /* default_config.rb in Resources */,
+				6ABE410E1313B263001CA6B4 /* event_handler.rb in Resources */,
+				6ABE410F1313B263001CA6B4 /* keymap.rb in Resources */,
+				6ABE41101313B263001CA6B4 /* keystroke.rb in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
