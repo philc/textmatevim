@@ -19,6 +19,7 @@ map "0", "move_to_beginning_of_line"
 map "$", "move_to_end_of_line"
 
 map "G", "move_to_end_of_document"
+map "gg", "move_to_beginning_of_document"
 
 map "<C-d>", "half_page_down"
 map "<C-u>", "half_page_up"
