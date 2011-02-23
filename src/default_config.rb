@@ -20,9 +20,9 @@ map "$", "move_to_end_of_line"
 
 map "G", "move_to_end_of_document"
 
-map "ctrl+d", "half_page_down"
-map "ctrl+u", "half_page_up"
+map "<C-d>", "half_page_down"
+map "<C-u>", "half_page_up"
 
 mode(:insert) do
-  map "escape", "enter_command_mode"
+  map "<esc>", "enter_command_mode"
 end

@@ -16,21 +16,23 @@ class KeyStroke
   HelpKeyMask       = 1 << 22
   FunctionKeyMask   = 1 << 23
 
+  # Refer to Vim's readable key mapping: http://vim.wikia.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_2)
   @@readable_to_key = {
     "enter" => "\r",
     "tab" => "\t",
     "space" => " ",
-    "escape" => "\e",
+    "esc" => "\e",
     "backspace" => "\b"
   }
   @@key_to_readable = @@readable_to_key.invert
 
   MODIFIER_MAP = {
-    "cmd" => CommandKeyMask,
-    "ctrl" => ControlKeyMask,
+    "M" => CommandKeyMask,
+    "C" => ControlKeyMask,
+    "A" => AlternateKeyMask,
+    "S" => ShiftKeyMask,
+    # Unused:
     "fn" => FunctionKeyMask,
-    "opt" => AlternateKeyMask,
-    "shift" => ShiftKeyMask,
     "numpad" => NumericPadKeyMask
   }
 
@@ -40,28 +42,34 @@ class KeyStroke
   attr_accessor :modifiers
   attr_accessor :key
 
-  def initialize
+  def initialize()
     @modifiers = []
   end
 
   # Returns a keystroke from a string description of the keystroke.
-  # The keystroke_string should be in the form of "CMD+H".
+  # The keystroke_string should be in the form of "z" or "<M-h>".
   def self.from_string(keystroke_string)
     keystroke = KeyStroke.new
-    parts = keystroke_string.downcase.split("+")
-    keystroke.key = parts.last
-    keystroke.key = @@readable_to_key[keystroke.key] if @@readable_to_key[keystroke.key]
-    if parts.size > 1
-      keystroke.modifiers = parts[0..-2]
+
+    char = keystroke_string[0].chr
+    if char == "<"
+      raise "Invalid keystroke" unless keystroke_string.match(/<[^<>]+>/)
+      keystroke_string = keystroke_string[1..-2] # Strip off the <>
+      modifiers = keystroke_string.split("-")[0..-2]
+      keystroke.modifiers = modifiers.sort
+      # Extract the keystroke which follows all of those modifiers.
+      key = keystroke_string.match(/(?:.\-)*(.+)/)[1]
+      keystroke.key = @@readable_to_key[key.downcase] || key
+    else
+      raise "keystroke should contain only one character" if keystroke_string.size > 1
+      keystroke.key = char
     end
 
-    # We must special case the arrow keys. It's nice to be able to say "up" in your keystroke_string,
-    # but unfortunately "up" is a combination of the up key and the function and numpad modifiers,
-    # at least on the alulminimum bluetooth keyboard.
-    if ["up", "down", "right", "left"].include?(keystroke.key)
-      keystroke.modifiers += ["fn"]
+    if (keystroke.key.size == 1 && keystroke.key.downcase != keystroke.key)
+      keystroke.modifiers = (keystroke.modifiers + ["S"]).uniq.sort
+      keystroke.key.downcase!
     end
-    keystroke.modifiers.sort!
+
     keystroke
   end
 
@@ -83,66 +91,30 @@ class KeyStroke
 
   def self.flags_to_modifiers(modifier_flags)
     modifier_keys = {
-      "cmd" => modifier_flags & CommandKeyMask != 0,
-      "ctrl" => modifier_flags & ControlKeyMask != 0,
-      "fn" => modifier_flags & FunctionKeyMask != 0,
-      "opt" => modifier_flags & AlternateKeyMask != 0,
-      "shift" => modifier_flags & ShiftKeyMask != 0
+      "M" => modifier_flags & CommandKeyMask != 0,
+      "C" => modifier_flags & ControlKeyMask != 0,
+      "A" => modifier_flags & AlternateKeyMask != 0,
+      "S" => modifier_flags & ShiftKeyMask != 0
     }
     modifier_keys.reject! { |key, value| value == false }.keys.sort
   end
 
-  def text
-    # The text associated with this keystroke. Usually it's the character corresponding to the keycode of the
-    # keystroke, but its value can be set to more than one character when we're executing a snippet.
-    @text || (is_modifier? ? nil : self.key)
-  end
-
-  def text=(value)
-    @text = value
-  end
-
   def to_s
-    parts = []
-
-    if key
-      if is_modifier?
-        parts = [translate_to_modifier(key)]
-      else
-        parts = modifiers.dup
-        # inspect will properly escape characters like "\t", but it will include "" around
-        # the key. Remove them.
-        escaped = key.inspect[1..-2]
-        parts.push(@@key_to_readable[key] || escaped)
-
-        # When shift is used with a regular character, like shift+g, just translate that to "G".
-        # When shift is used with a non-regular character, leave it on (e.g. shift+UP)
-        # Instead of returning "shift+g", 
-        if (parts.include?("shift") && escaped.downcase != escaped.upcase)
-          parts.delete("shift")
-          parts[-1] = parts.last.upcase
-        end
-      end
-    else
-      parts = modifiers.dup
+    key = self.key.dup
+    modifiers = self.modifiers.dup
+    if modifiers.include?("S")
+      modifiers.delete("S")
+      key.upcase!
     end
 
-    return parts.join("+")
+    if modifiers.empty?
+      @@key_to_readable[key] ? "<#{@@key_to_readable[key]}>" : key
+    else
+      "<" + modifiers.map { |modifier| modifier + "-" }.join + (@@key_to_readable[key] || key) + ">"
+    end
   end
 
   def <=>(other)
     to_s <=> other.to_s
-  end
-
-  def is_modifier?
-    translated_key = translate_to_modifier(self.key)
-    translated_key and MODIFIER_MAP.has_key?(translated_key)
-  end
-
-  def translate_to_modifier(key)
-    # The key is going to be precise, like "left_cmd". Translate this into "cmd" if possible.
-    key = key.sub("left_", "").sub("right_", "")
-    return nil unless %w(cmd ctrl fn opt shift numpad).include?(key)
-    key
   end
 end
