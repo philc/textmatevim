@@ -59,6 +59,8 @@ static NSString * currentMode;
       NSLog(@"%@", command);
       if ([command isEqualToString: @"enterCommandMode"])
         [self enterCommandMode];
+      else if ([command isEqualToString: @"addNewline"])
+        [self addNewline];
       else if ([command isEqualToString: @"enterInsertMode"])
         [self enterInsertMode];
       else
@@ -69,6 +71,8 @@ static NSString * currentMode;
     [super sendEvent: event];
   }
 }
+
+- (void)addNewline { [[self firstResponder] insertText:@"\n"]; }
 
 - (void)enterCommandMode {
   currentMode = @"command";

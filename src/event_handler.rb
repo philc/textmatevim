@@ -83,6 +83,7 @@ class EventHandler
   #
   # Command methods
   # These methods are all possible methods you can map to when defining keybindings.
+
   def enter_command_mode
     self.current_mode = :command
     ["enterCommandMode"]
@@ -94,12 +95,14 @@ class EventHandler
   end
 
   def insert_backward() enter_insert_mode end
-
   def insert_forward() ["moveForward:"] + enter_insert_mode end
 
   def insert_at_beginning_of_line() move_to_beginning_of_line + enter_insert_mode end
+  def insert_at_end_of_line() move_to_end_of_line + enter_insert_mode end
 
-  # These could be defined programmatically with define_method, but it turns out to be clearer this way.
+  def insert_newline_above() ["moveUp:", "moveToEndOfLine:", "addNewline"] + enter_insert_mode end
+  def insert_newline_below() ["moveToEndOfLine:", "addNewline"] + enter_insert_mode end
+
   def move_backward() ["moveBackward:"] end
   def move_forward() ["moveForward:"] end
   def move_down() ["moveDown:"] end

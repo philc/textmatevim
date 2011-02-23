@@ -6,6 +6,10 @@ include KeyMap
 
 map "i", "insert_backward"
 map "a", "insert_forward"
+map "I", "insert_at_beginning_of_line"
+map "A", "insert_at_end_of_line"
+map "O", "insert_newline_above"
+map "o", "insert_newline_below"
 
 map "h", "move_backward"
 map "l", "move_forward"
