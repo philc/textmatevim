@@ -45,7 +45,7 @@ class EventHandler
   def move_up() ["moveUp:"] end
 
   def half_page_down() ["moveDown:"] * 6 end
-  def half_page_up() ["moveUp"] * 6 end
+  def half_page_up() ["moveUp:"] * 6 end
 
   def move_word_backward() ["moveWordBackward:"] end
   def move_word_forward() ["moveWordForward:"] end
