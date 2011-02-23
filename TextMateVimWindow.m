@@ -51,7 +51,7 @@ static NSString * currentMode;
 
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
   if (commands.count > 0) {
-    if ([[commands objectAtIndex:i] isEqualToString: @"noOp"])
+    if ([[commands objectAtIndex:0] isEqualToString: @"noOp"])
       return;
 
     for (int i = 0; i < commands.count; i++) {

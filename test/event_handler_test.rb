@@ -18,7 +18,7 @@ class EventHandlerTest < Test::Unit::TestCase
 
     should "transition to insert mode from command mdoe" do
       @event_handler.current_mode = :command
-      stub_keymap(:command => { "i" => "enter_insert_mode" })
+      stub_keymap(:command => { "i" => "insert_backward" })
       type_key "i"
       assert_equal :insert, @event_handler.current_mode
     end

@@ -4,7 +4,8 @@
 require "keymap"
 include KeyMap
 
-map "i", "enter_insert_mode"
+map "i", "insert_backward"
+map "a", "insert_forward"
 
 map "h", "move_backward"
 map "l", "move_forward"

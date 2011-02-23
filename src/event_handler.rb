@@ -63,35 +63,41 @@ class EventHandler
     keystroke_string = keystrokes.map(&:to_s).join
     closest_match = closest_binary_search(KeyMap.user_keymap[mode].keys,
         keystroke_string)
+    closest_match.index(keystroke_string) == 0
   end
 
   # Returns the result if found, or the cloest item that could be found.
-  def self.closest_binary_search(array, target, low = 0, high = array.length)
+  def self.closest_binary_search(array, target, low = 0, high = array.length - 1)
     mid = low + ((high - low) / 2).to_i
-    if low > high
-      array[low]
+    if high < low
+      array[high]
     elsif target < array[mid]
       closest_binary_search(array, target, low, mid - 1)
     elsif target > array[mid]
       closest_binary_search(array, target, mid + 1, high)
     else
-      mid
+      array[mid]
     end
   end
 
   #
   # Command methods
   # These methods are all possible methods you can map to when defining keybindings.
-  def enter_insert_mode
-    self.current_mode = :insert
-    ["enterInsertMove"]
-  end
-
   def enter_command_mode
     self.current_mode = :command
     ["enterCommandMode"]
   end
 
+  def enter_insert_mode
+    self.current_mode = :insert
+    ["enterInsertMode"]
+  end
+
+  def insert_backward() enter_insert_mode end
+
+  def insert_forward() ["moveForward:"] + enter_insert_mode end
+
+  def insert_at_beginning_of_line() move_to_beginning_of_line + enter_insert_mode end
 
   # These could be defined programmatically with define_method, but it turns out to be clearer this way.
   def move_backward() ["moveBackward:"] end
@@ -130,7 +136,7 @@ if $0 == __FILE__
       response = event_handler.handle_key_message(message)
       log "response: #{response.inspect}"
     rescue => error
-      log error.inspect
+      log error.to_s
       response = []
     end
     puts response.to_json
