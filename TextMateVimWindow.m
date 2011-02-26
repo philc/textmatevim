@@ -70,7 +70,12 @@ static NSNumber * columnNumber;
     return;
   }
 
+
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
+
+  NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
+      @"enterCommandMode", @"enterInsertMode", @"addNewline", nil];
+
   if (commands.count > 0) {
     if ([[commands objectAtIndex:0] isEqualToString: @"noOp"])
       return;
@@ -78,12 +83,8 @@ static NSNumber * columnNumber;
     for (int i = 0; i < commands.count; i++) {
       NSString * command = [commands objectAtIndex:i];
       NSLog(@"%@", command);
-      if ([command isEqualToString: @"enterCommandMode"])
-        [self enterCommandMode];
-      else if ([command isEqualToString: @"addNewline"])
-        [self addNewline];
-      else if ([command isEqualToString: @"enterInsertMode"])
-        [self enterInsertMode];
+      if ([nonTextViewCommands containsObject:command])
+        [self performSelector: NSSelectorFromString(command)];
       else
         // Pass the command on to Textmate's OakTextView.
         [[self firstResponder] performSelector: NSSelectorFromString(command) withObject: self];
