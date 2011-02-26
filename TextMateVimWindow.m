@@ -74,7 +74,7 @@ static NSNumber * columnNumber;
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
 
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterCommandMode", @"enterInsertMode", @"addNewline", nil];
+      @"enterCommandMode", @"enterInsertMode", @"addNewline", @"writeSelectionToPasteboard", nil];
 
   if (commands.count > 0) {
     if ([[commands objectAtIndex:0] isEqualToString: @"noOp"])
@@ -106,6 +106,11 @@ static NSNumber * columnNumber;
   currentMode = @"insert";
   if (cursorView)
     [cursorView setMode:currentMode];
+}
+
+- (void)writeSelectionToPasteboard {
+  [[self firstResponder] writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
+      types:[NSArray arrayWithObject:@"NSStringPboardType"]];
 }
 
 - (void)setLineNumber:(id)theLineNumber {

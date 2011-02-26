@@ -30,6 +30,7 @@ class EventHandler
         self.key_queue = []
         self.send(command.to_sym)
       else
+        raise "Unrecognized command: #{command}"
         []
       end
     elsif key_queue_contains_partial_command?
@@ -94,15 +95,7 @@ class EventHandler
     ["enterInsertMode"]
   end
 
-  def insert_backward() enter_insert_mode end
-  def insert_forward() ["moveForward:"] + enter_insert_mode end
-
-  def insert_at_beginning_of_line() move_to_beginning_of_line + enter_insert_mode end
-  def insert_at_end_of_line() move_to_end_of_line + enter_insert_mode end
-
-  def insert_newline_above() ["moveUp:", "moveToEndOfLine:", "addNewline"] + enter_insert_mode end
-  def insert_newline_below() ["moveToEndOfLine:", "addNewline"] + enter_insert_mode end
-
+  # Movement
   def move_backward() ["moveBackward:"] end
   def move_forward() ["moveForward:"] end
   def move_down() ["moveDown:"] end
@@ -120,6 +113,20 @@ class EventHandler
 
   def move_to_beginning_of_document() ["moveToBeginningOfDocument:"] end
   def move_to_end_of_document() ["moveToEndOfDocument:"] end
+
+  # Insertion
+  def insert_backward() enter_insert_mode end
+  def insert_forward() ["moveForward:"] + enter_insert_mode end
+
+  def insert_at_beginning_of_line() move_to_beginning_of_line + enter_insert_mode end
+  def insert_at_end_of_line() move_to_end_of_line + enter_insert_mode end
+
+  def insert_newline_above() ["moveUp:", "moveToEndOfLine:", "addNewline"] + enter_insert_mode end
+  def insert_newline_below() ["moveToEndOfLine:", "addNewline"] + enter_insert_mode end
+
+  # Cutting
+  def cut_backward() ["moveBackwardAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"] end
+  def cut_forward() ["moveForwardAndModifySelection:", "writeSelectionToPasteboard", "deleteForward:"] end
 
   def no_op_command() ["noOp"] end
 end
