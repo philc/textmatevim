@@ -11,9 +11,36 @@
 static TextMateVimWindow * currentWindow;
 static CommandModeCursor * cursorView;
 static NSString * currentMode;
+static NSNumber * lineNumber;
+static NSNumber * columnNumber;
 
 + (BOOL)isValidWindowType:(NSWindow *)window {
   return [[window firstResponder] isKindOfClass:NSClassFromString(@"OakTextView")];
+}
+
+/*
+ * When a different window gets focused, we must add our cursor view to it and register a few bindings.
+ */
+- (void)setFocusedWindow:(NSWindow *)theWindow {
+  if (currentWindow != nil) {
+    [[currentWindow firstResponder] unbind:@"lineNumber"];
+    [[currentWindow firstResponder] unbind:@"columnNumber"];
+  }
+
+  currentWindow = self;
+  currentMode = currentMode ? currentMode : @"insert";
+  id responder = [self firstResponder];
+
+  if (cursorView)
+    [cursorView removeFromSuperview];
+  cursorView = [[CommandModeCursor alloc] initWithFrame:[responder bounds]];
+  [responder addSubview:cursorView];
+  [cursorView setMode:currentMode];
+
+  // NOTE(philc): For some reason these values are only available via binding. There are no methods on
+  // OakTextView for lineNumber and columnNumber.
+  [responder bind:@"lineNumber" toObject:self withKeyPath:@"lineNumber" options:nil];
+  [responder bind:@"columnNumber" toObject:self withKeyPath:@"columnNumber" options:nil];
 }
 
 - (void)sendEvent:(NSEvent *)event {
@@ -23,20 +50,14 @@ static NSString * currentMode;
   }
 
   // If we've just changed windows, make sure that our cursor is being rendered in the current window.
-  if (self != currentWindow) {
-    currentWindow = self;
-    id responder = [self firstResponder];
-    currentMode = currentMode ? currentMode : @"insert";
-    if (cursorView)
-      [cursorView removeFromSuperview];
-    cursorView = [[CommandModeCursor alloc] initWithFrame:[responder bounds]];
-    [responder addSubview:cursorView];
-    [cursorView setMode:currentMode];
-  }
+  if (self != currentWindow)
+    [self setFocusedWindow:self];
 
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
       event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
+      lineNumber, @"lineNumber",
+      columnNumber, @"columnNumber",
       nil];
   fputs([[dict JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
   fputs("\n", [TextMateVimPlugin eventRouterStdin]);
@@ -85,5 +106,23 @@ static NSString * currentMode;
   if (cursorView)
     [cursorView setMode:currentMode];
 }
+
+- (void)setLineNumber:(id)theLineNumber {
+  if (lineNumber)
+    [lineNumber release];
+  lineNumber = theLineNumber;
+  [lineNumber retain];
+}
+
+- (NSNumber *)lineNumber { return lineNumber; }
+
+- (void)setColumnNumber:(id)theColumnNumber {
+  if (columnNumber)
+    [columnNumber release];
+  columnNumber = theColumnNumber;
+  [columnNumber retain];
+}
+
+- (NSNumber *)columnNumber { return columnNumber; }
 
 @end
