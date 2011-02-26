@@ -9,7 +9,7 @@ task :run => :build
 
 task :build do
   # Textmate is currently built against i386, and so must our plugin be.
-  puts `xcodebuild -configuration #{CONFIGURATION} ARCHS="i386"`
+  sh "xcodebuild -configuration #{CONFIGURATION} ARCHS='i386'"
 end
 
 task :run do
@@ -18,7 +18,7 @@ end
 
 task :test do |task|
   Dir.glob("test/*_test.rb").each do |filename|
-    puts `ruby #{filename}`
+    sh "ruby #{filename}"
   end
 end
 
@@ -41,5 +41,5 @@ end
 
 def kill_process(name)
   pid = `ps ax | grep #{name} | grep -v grep`.split(" ")[0]
-  `kill -9 #{pid}` if pid
+  sh "kill -9 #{pid}" if pid
 end
