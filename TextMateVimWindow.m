@@ -97,6 +97,10 @@ static NSNumber * columnNumber;
 
 - (void)addNewline { [[self firstResponder] insertText:@"\n"]; }
 
+/* NOTE(philc): I'm not sure what this argument is supposed to be to undo, but using 0 causes the last
+ * action to be undone, which is precisely what we need. */
+- (void)undo { [[self firstResponder] undo:0]; }
+
 - (void)enterCommandMode {
   currentMode = @"command";
   if (cursorView)

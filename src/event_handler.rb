@@ -128,6 +128,11 @@ class EventHandler
     ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
   end
 
+  # Other
+  # TODO(philc): It would be nice if this could restore the user's cursor position when unrolling one of our
+  # commands.
+  def undo() ["undo"] end
+
   def no_op_command() ["noOp"] end
 end
 
