@@ -106,7 +106,7 @@ class EventHandler
   def insert_at_beginning_of_line() move_to_beginning_of_line + enter_insert_mode end
   def insert_at_end_of_line() move_to_end_of_line + enter_insert_mode end
 
-  def insert_newline_above() ["moveUp:", "moveToEndOfLine:", "addNewline"] + enter_insert_mode end
+  def insert_newline_above() ["moveToBeginningOfLine:", "addNewline", "moveUp:"] + enter_insert_mode end
   def insert_newline_below() ["moveToEndOfLine:", "addNewline"] + enter_insert_mode end
 
   # Cutting
