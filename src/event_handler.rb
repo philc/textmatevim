@@ -6,17 +6,24 @@ require "keystroke"
 require "keymap"
 
 class EventHandler
-  attr_accessor :current_mode
-  attr_accessor :key_queue
+  attr_accessor :current_mode, :key_queue, :previous_command_stack
   # TODO(philc): This limit should be based on the longest of the user's mapped commands.
   KEY_QUEUE_LIMIT = 3
+
+  # This is how many mutating commands we keep track of, for the purposes of restoring the original cursor
+  # position when these commands get unwound via "undo".
+  UNDO_STACK_SIZE = 3
+
+  MUTATING_COMMANDS = %W(cut_backward cut_forward cut_word_forward cut_word_backward cut_line
+       cut_to_beginning_of_line cut_to_end_of_line)
 
   def initialize
     self.current_mode = :insert
     self.key_queue = []
+    self.previous_command_stack = []
   end
 
-   def handle_key_message(message)
+  def handle_key_message(message)
     @message = JSON.parse(message)
     keystroke = KeyStroke.from_character_and_modifier_flags(@message["characters"], @message["modifierFlags"])
 
@@ -25,10 +32,18 @@ class EventHandler
 
     command = command_for_key_queue()
 
-    if (command)
+    if command
       if self.respond_to?(command.to_sym)
         self.key_queue = []
-        self.send(command.to_sym)
+        result = self.send(command.to_sym)
+        # When executing commands which modify the document, keep track of the original cursor position
+        # so we can restore it when we unwind these commands via undo.
+        if MUTATING_COMMANDS.include?(command)
+          previous_command_stack.push(
+              { :command => command, :line => @message["line"], :column => @message["column"]})
+          previous_command_stack.shift if previous_command_stack.size > UNDO_STACK_SIZE
+        end
+        result
       else
         raise "Unrecognized command: #{command}"
         []
@@ -36,7 +51,7 @@ class EventHandler
     elsif key_queue_contains_partial_command?
       no_op_command()
     else
-      []
+      [] # the key will pass through to TextMate.
     end
   end
 
@@ -69,6 +84,7 @@ class EventHandler
   #
   # Command methods
   # These methods are all possible methods you can map to when defining keybindings.
+  #
 
   def enter_command_mode
     self.current_mode = :command
@@ -77,6 +93,7 @@ class EventHandler
 
   def enter_insert_mode
     self.current_mode = :insert
+    self.previous_command_stack.clear()
     ["enterInsertMode"]
   end
 
@@ -99,7 +116,9 @@ class EventHandler
   def move_to_beginning_of_document() ["moveToBeginningOfDocument:"] end
   def move_to_end_of_document() ["moveToEndOfDocument:"] end
 
+  #
   # Insertion
+  #
   def insert_backward() enter_insert_mode end
   def insert_forward() ["moveForward:"] + enter_insert_mode end
 
@@ -109,7 +128,9 @@ class EventHandler
   def insert_newline_above() ["moveToBeginningOfLine:", "addNewline", "moveUp:"] + enter_insert_mode end
   def insert_newline_below() ["moveToEndOfLine:", "addNewline"] + enter_insert_mode end
 
+  #
   # Cutting
+  #
   def cut_backward() ["moveBackwardAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"] end
   def cut_forward() ["moveForwardAndModifySelection:", "writeSelectionToPasteboard", "deleteForward:"] end
 
@@ -136,17 +157,33 @@ class EventHandler
     ["moveToEndOfLineAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
   end
 
+  #
   # Other
-  # TODO(philc): It would be nice if this could restore the user's cursor position when unrolling one of our
-  # commands.
-  def undo() ["undo"] end
+  #
+  def undo()
+    # If we're undoing a previous command which mutated the document, restore the user's cursor position.
+    saved_state = previous_command_stack.pop
+    ["undo"] + (saved_state ? set_cursor_position(saved_state[:line], saved_state[:column]) : [])
+  end
 
   def no_op_command() ["noOp"] end
+
+  def set_cursor_position(line, column)
+    # On the Textmate text view, we have access to a function which lets us set the position of the boundary
+    # of one end of the current selection. To collapse that selection, we need to know which end the cursor
+    # is on. As a brute force approach, set the selection to the beginning of the document and then move left.
+    # Doing so can change the window's vertical scroll position, so we'll restore that.
+    [{ "setSelection:column:" => [0, 0]}, "moveBackward:",
+     { "setSelection:column:" => [line + 1, column + 1]}, "moveForward:",
+     { "scrollTo:" => [@message["scrollY"]]}]
+  end
 end
 
 def log(str)
   file = File.open("/tmp/event_handler.log", "a") { |file| file.puts(str) }
 end
+
+log "loading event handler"
 
 if $0 == __FILE__
   log "TextMateVim event_handler coprocess is online."

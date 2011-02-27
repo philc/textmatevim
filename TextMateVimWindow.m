@@ -53,12 +53,14 @@ static NSNumber * columnNumber;
   if (self != currentWindow)
     [self setFocusedWindow:self];
 
+  NSView * oakTextView = [self firstResponder];
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
       event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
-      lineNumber, @"lineNumber",
-      columnNumber, @"columnNumber",
-      [NSNumber numberWithBool:[[self firstResponder] hasSelection]], @"hasSelection",
+      lineNumber, @"line",
+      columnNumber, @"column",
+      [NSNumber numberWithBool: [oakTextView hasSelection]], @"hasSelection",
+      [NSNumber numberWithFloat: [self getScrollPosition: oakTextView].y], @"scrollY",
       nil];
   fputs([[dict JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
   fputs("\n", [TextMateVimPlugin eventRouterStdin]);
@@ -74,7 +76,7 @@ static NSNumber * columnNumber;
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
       @"enterCommandMode", @"enterInsertMode", @"addNewline", @"writeSelectionToPasteboard", @"noOp",
-      @"setSelection:column:", @"undo", nil];
+      @"scrollTo:", @"setSelection:column:", @"undo", nil];
 
   if (commands.count > 0) {
 
@@ -109,7 +111,7 @@ static NSNumber * columnNumber;
       }
       else
         // Pass the command on to Textmate's OakTextView.
-        [[self firstResponder] performSelector: NSSelectorFromString(command) withObject: self];
+        [oakTextView performSelector: NSSelectorFromString(command) withObject: self];
     }
   } else {
     [super sendEvent: event];
@@ -123,6 +125,13 @@ static NSNumber * columnNumber;
 
 - (void)setSelection:(NSNumber *)line column:(NSNumber *)column {
   [[self firstResponder] selectToLine:line andColumn:column];
+}
+
+/* Scrolls the OakTextView to the given Y coordinate. TODO(philc): Support X as well. */
+- (void)scrollTo:(NSNumber *)y {
+  NSPoint scrollPosition = [self getScrollPosition: (NSView *)[self firstResponder]];
+  scrollPosition.y = y.floatValue;
+  [[self firstResponder] scrollPoint: scrollPosition];
 }
 
 - (void)addNewline { [[self firstResponder] insertText:@"\n"]; }
@@ -165,5 +174,8 @@ static NSNumber * columnNumber;
 }
 
 - (NSNumber *)columnNumber { return columnNumber; }
+
+/* For the given NSView, retrieves its scroll position. */
+- (NSPoint)getScrollPosition:(NSView *)view { return view.enclosingScrollView.documentVisibleRect.origin; }
 
 @end

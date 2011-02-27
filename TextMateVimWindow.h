@@ -9,6 +9,7 @@
 - (void)sendEvent:(NSEvent *)theEvent;
 - (void)enterCommandMode;
 - (void)enterInsertMode;
+- (NSPoint)getScrollPosition:(NSView *)view;
 
 
 @end
