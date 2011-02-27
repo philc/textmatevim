@@ -124,6 +124,10 @@ class EventHandler
     ["moveWordBackwardAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
   end
 
+  def cut_line()
+    ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
+  end
+
   def no_op_command() ["noOp"] end
 end
 

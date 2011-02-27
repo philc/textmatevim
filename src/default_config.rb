@@ -37,6 +37,7 @@ map "dl", "cut_forward"
 map "dh", "cut_backward"
 map "dw", "cut_word_forward"
 map "db", "cut_word_backward"
+map "dd", "cut_line"
 
 
 mode(:insert) do
