@@ -58,6 +58,7 @@ static NSNumber * columnNumber;
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
       lineNumber, @"lineNumber",
       columnNumber, @"columnNumber",
+      [NSNumber numberWithBool:[[self firstResponder] hasSelection]], @"hasSelection",
       nil];
   fputs([[dict JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
   fputs("\n", [TextMateVimPlugin eventRouterStdin]);

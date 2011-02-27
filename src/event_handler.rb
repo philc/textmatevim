@@ -16,9 +16,9 @@ class EventHandler
     self.key_queue = []
   end
 
-  def handle_key_message(message)
-    message = JSON.parse(message)
-    keystroke = KeyStroke.from_character_and_modifier_flags(message["characters"], message["modifierFlags"])
+   def handle_key_message(message)
+    @message = JSON.parse(message)
+    keystroke = KeyStroke.from_character_and_modifier_flags(@message["characters"], @message["modifierFlags"])
 
     key_queue.push(keystroke.to_s)
     key_queue.shift if key_queue.size > KEY_QUEUE_LIMIT
@@ -72,7 +72,7 @@ class EventHandler
 
   def enter_command_mode
     self.current_mode = :command
-    ["enterCommandMode"]
+    ["enterCommandMode"] + (@message["hasSelection"] ? ["moveBackward:"] : [])
   end
 
   def enter_insert_mode
