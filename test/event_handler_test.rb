@@ -30,7 +30,7 @@ class EventHandlerTest < Test::Unit::TestCase
       assert_equal :command, @event_handler.current_mode
     end
 
-    should "queue up keystrokes and execute commands consistent of multiple keystrokes" do
+    should "queue up keystrokes and execute commands composed of multiple keystrokes" do
       @event_handler.current_mode = :command
       stub_keymap(:command => { "gg" => "move_to_beginning_of_document" })
       # The first key should result in a noOp, because it might turn out to be part of the "gg" command.

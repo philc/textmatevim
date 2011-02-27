@@ -21,7 +21,7 @@ class EventHandler
     keystroke = KeyStroke.from_character_and_modifier_flags(message["characters"], message["modifierFlags"])
 
     key_queue.push(keystroke.to_s)
-    key_queue.unshift if key_queue.size > KEY_QUEUE_LIMIT
+    key_queue.shift if key_queue.size > KEY_QUEUE_LIMIT
 
     command = command_for_key_queue()
 
@@ -62,23 +62,8 @@ class EventHandler
   # Whether the given keystrokes are the beginning (prefix) of a longer command.
   def self.is_partial_user_command?(mode, keystrokes)
     keystroke_string = keystrokes.map(&:to_s).join
-    closest_match = closest_binary_search(KeyMap.user_keymap[mode].keys,
-        keystroke_string)
-    closest_match.index(keystroke_string) == 0
-  end
-
-  # Returns the result if found, or the cloest item that could be found.
-  def self.closest_binary_search(array, target, low = 0, high = array.length - 1)
-    mid = low + ((high - low) / 2).to_i
-    if high < low
-      array[high]
-    elsif target < array[mid]
-      closest_binary_search(array, target, low, mid - 1)
-    elsif target > array[mid]
-      closest_binary_search(array, target, mid + 1, high)
-    else
-      array[mid]
-    end
+    # This search could be logarithmic.
+    KeyMap.user_keymap[mode].keys.find { |command| command.index(keystroke_string) == 0 } != nil
   end
 
   #
