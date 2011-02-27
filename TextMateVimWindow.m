@@ -71,21 +71,42 @@ static NSNumber * columnNumber;
     return;
   }
 
-
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
-
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterCommandMode", @"enterInsertMode", @"addNewline", @"writeSelectionToPasteboard", nil];
+      @"enterCommandMode", @"enterInsertMode", @"addNewline", @"writeSelectionToPasteboard", @"noOp",
+      @"setSelection:column:", @"undo", nil];
 
   if (commands.count > 0) {
-    if ([[commands objectAtIndex:0] isEqualToString: @"noOp"])
-      return;
 
     for (int i = 0; i < commands.count; i++) {
-      NSString * command = [commands objectAtIndex:i];
-      NSLog(@"%@", command);
-      if ([nonTextViewCommands containsObject:command])
-        [self performSelector: NSSelectorFromString(command)];
+      NSString * command = nil;
+      NSArray * arguments = nil;
+      NSObject * commandStructure = [commands objectAtIndex:i];
+
+      if ([commandStructure isKindOfClass:[NSDictionary class]]) {
+        // If this command is a hash, it's on the form { "commandName" => [arguments] }.
+        command = [[commandStructure allKeys] objectAtIndex:0];
+        arguments = [commandStructure objectForKey:command];
+      } else {
+        command = (NSString *) commandStructure;
+      }
+      
+      if ([nonTextViewCommands containsObject:command]) {
+        // NSInvocation is necessary to handle calling methods with an arbitrary number of arguments.
+        NSMethodSignature * methodSignature =
+            [[self class] instanceMethodSignatureForSelector:NSSelectorFromString(command)];
+        NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+        [invocation setTarget:self];
+        [invocation setSelector:NSSelectorFromString(command)];
+        if (arguments) {
+          for (int i = 0; i < arguments.count; i++) { 
+            NSObject * arg = [arguments objectAtIndex:i];
+            [invocation setArgument:&arg atIndex:i + 2];
+          }
+        }
+
+        [invocation invoke];
+      }
       else
         // Pass the command on to Textmate's OakTextView.
         [[self firstResponder] performSelector: NSSelectorFromString(command) withObject: self];
@@ -93,6 +114,15 @@ static NSNumber * columnNumber;
   } else {
     [super sendEvent: event];
   }
+}
+
+/*
+ * These are commands that the Ruby event handler can invoke.
+ */
+- (void)noOp { }
+
+- (void)setSelection:(NSNumber *)line column:(NSNumber *)column {
+  [[self firstResponder] selectToLine:line andColumn:column];
 }
 
 - (void)addNewline { [[self firstResponder] insertText:@"\n"]; }
