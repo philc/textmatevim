@@ -128,6 +128,14 @@ class EventHandler
     ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
   end
 
+  def cut_to_beginning_of_line()
+    ["moveToBeginningOfLineAndModifySelection:", "writeSelectionToPasteboard", "deleteForward:"]
+  end
+
+  def cut_to_end_of_line()
+    ["moveToEndOfLineAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
+  end
+
   # Other
   # TODO(philc): It would be nice if this could restore the user's cursor position when unrolling one of our
   # commands.

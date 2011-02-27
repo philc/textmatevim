@@ -38,6 +38,9 @@ map "dh", "cut_backward"
 map "dw", "cut_word_forward"
 map "db", "cut_word_backward"
 map "dd", "cut_line"
+map "d0", "cut_to_beginning_of_line"
+map "d$", "cut_to_end_of_line"
+map "D", "cut_to_end_of_line"
 
 # Other
 map "u", "undo"
