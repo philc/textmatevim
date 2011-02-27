@@ -113,6 +113,17 @@ class EventHandler
   def cut_backward() ["moveBackwardAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"] end
   def cut_forward() ["moveForwardAndModifySelection:", "writeSelectionToPasteboard", "deleteForward:"] end
 
+  # Which end of the selection we're modifying first matters. After hitting undo, we want
+  # the cursor to end up where it was prior to this command.
+  def cut_word_forward()
+    ["moveWordForward:", "moveWordBackwardAndModifySelection:", "writeSelectionToPasteboard",
+     "deleteForward:"]
+  end
+
+  def cut_word_backward()
+    ["moveWordBackwardAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
+  end
+
   def no_op_command() ["noOp"] end
 end
 

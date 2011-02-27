@@ -33,6 +33,10 @@ map "o", "insert_newline_below"
 
 # Cutting
 map "x", "cut_forward"
+map "dl", "cut_forward"
+map "dh", "cut_backward"
+map "dw", "cut_word_forward"
+map "db", "cut_word_backward"
 
 
 mode(:insert) do
