@@ -14,10 +14,10 @@ module KeyMap
   USER_KEYMAP = {}
   @current_mode = nil
 
-  def mode(mode, &block)
-    @current_mode = mode.to_sym
+  def mode(*modes, &block)
+    @current_modes = modes.map { |mode| mode.to_sym }
     block.call
-    @current_mode = nil
+    @current_modes = nil
   end
 
   # Parses a string which may contain multiple keystrokes, like "x<C-1>yz".
@@ -43,9 +43,11 @@ module KeyMap
     # keystroke_string may have many keys embedded (e.g. <C-A>gxyz). Parse each one out and then join them
     # back together, so the string of keys is normalized, e.g. the modifiers are in the correct sequence.
     keystrokes = KeyMap.keystrokes_from_string(keystroke_string)
-    mode = @current_mode || :command
-    KeyMap.user_keymap[mode] ||= {}
-    KeyMap.user_keymap[mode][keystrokes.map(&:to_s).join] = block.nil? ? command_name : block
+    modes = @current_modes || [:command]
+    modes.each do |mode|
+      KeyMap.user_keymap[mode] ||= {}
+      KeyMap.user_keymap[mode][keystrokes.map(&:to_s).join] = block.nil? ? command_name : block
+    end
   end
 
   def self.user_keymap
