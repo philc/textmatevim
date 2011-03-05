@@ -53,7 +53,7 @@ static NSNumber * columnNumber;
   if (self != currentWindow)
     [self setFocusedWindow:self];
 
-  NSView * oakTextView = [self firstResponder];
+  id oakTextView = [self firstResponder];
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
       event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
@@ -75,7 +75,7 @@ static NSNumber * columnNumber;
 
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterCommandMode", @"enterInsertMode", @"addNewline", @"writeSelectionToPasteboard", @"noOp",
+      @"enterMode:", @"addNewline", @"writeSelectionToPasteboard", @"noOp",
       @"scrollTo:", @"setSelection:column:", @"undo", nil];
 
   if (commands.count > 0) {
@@ -140,16 +140,10 @@ static NSNumber * columnNumber;
  * action to be undone, which is precisely what we need. */
 - (void)undo { [[self firstResponder] undo:0]; }
 
-- (void)enterCommandMode {
-  currentMode = @"command";
+- (void)enterMode:(NSString *)mode {
+  currentMode = mode;
   if (cursorView)
-    [cursorView setMode:currentMode];
-}
-
-- (void)enterInsertMode {
-  currentMode = @"insert";
-  if (cursorView)
-    [cursorView setMode:currentMode];
+    [cursorView setMode: mode];
 }
 
 - (void)writeSelectionToPasteboard {

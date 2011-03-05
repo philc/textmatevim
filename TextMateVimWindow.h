@@ -7,8 +7,7 @@
 - (void)addNewline;
 + (BOOL)isValidWindowType:(NSWindow *)theWindow;
 - (void)sendEvent:(NSEvent *)theEvent;
-- (void)enterCommandMode;
-- (void)enterInsertMode;
+- (void)enterMode;
 - (NSPoint)getScrollPosition:(NSView *)view;
 
 

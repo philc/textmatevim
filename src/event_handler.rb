@@ -88,13 +88,18 @@ class EventHandler
 
   def enter_command_mode
     self.current_mode = :command
-    ["enterCommandMode"] + (@message["hasSelection"] ? ["moveBackward:"] : [])
+    [{ "enterMode:" => ["command"] }] + (@message["hasSelection"] ? ["moveBackward:"] : [])
   end
 
   def enter_insert_mode
     self.current_mode = :insert
     self.previous_command_stack.clear()
-    ["enterInsertMode"]
+    [{ "enterMode:" => ["insert"] }]
+  end
+
+  def enter_visual_mode
+    self.current_mode = :visual
+    [{ "enterMode:" => ["visual"] }]
   end
 
   # Movement
@@ -173,9 +178,9 @@ class EventHandler
     # of one end of the current selection. To collapse that selection, we need to know which end the cursor
     # is on. As a brute force approach, set the selection to the beginning of the document and then move left.
     # Doing so can change the window's vertical scroll position, so we'll restore that.
-    [{ "setSelection:column:" => [0, 0]}, "moveBackward:",
-     { "setSelection:column:" => [line + 1, column + 1]}, "moveForward:",
-     { "scrollTo:" => [@message["scrollY"]]}]
+    [{ "setSelection:column:" => [0, 0] }, "moveBackward:",
+     { "setSelection:column:" => [line + 1, column + 1] }, "moveForward:",
+     { "scrollTo:" => [@message["scrollY"]] }]
   end
 end
 

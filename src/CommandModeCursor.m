@@ -30,6 +30,8 @@
     return;
   NSLog(@"%@", @"setting mode on command mode cursor");
 
+  [mode release];
+  [theMode retain];
   mode = theMode;
   [self setNeedsDisplay:TRUE];
 
@@ -40,7 +42,7 @@
 }
 
 - (void)drawRect:(NSRect)rect {
-  if (![mode isEqualToString:@"command"])
+  if ([mode isEqualToString:@"insert"])
     return;
 
   id oakTextView = [self superview];

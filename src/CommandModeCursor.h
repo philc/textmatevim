@@ -12,6 +12,6 @@
 }
 
 - (void)setMode:(NSString *)mode;
-- (void)setCaretColor:(NSColor*)color;
+- (void)setCaretColor:(NSColor *)color;
 
 @end
