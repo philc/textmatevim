@@ -50,6 +50,13 @@ mode(:command) do
   map "d$", "cut_to_end_of_line"
   map "D", "cut_to_end_of_line"
 
+  # Copying
+  map "yy", "copy_line"
+  map "yl", "copy_forward"
+  map "yh", "copy_backward"
+  map "yw", "copy_word_forward"
+  map "yb", "copy_word_backward"
+
   map "v", "enter_visual_mode"
 end
 
@@ -76,6 +83,8 @@ mode(:visual) do
 
   map "x", ["cut_forward", "enter_command_mode"]
   map "dl", ["cut_forward", "enter_command_mode"]
+
+  map "y", ["copy_selection", "enter_command_mode"]
 end
 
 mode(:insert) do

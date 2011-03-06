@@ -39,13 +39,6 @@ class EventHandler
   end
 
   def handle_key_message(message)
-    if $modified_time != File.stat(SOURCE_PATH)
-      $modified_time = File.stat(SOURCE_PATH)
-      load(SOURCE_PATH)
-      return handle_key_message(message)
-    end
-
-    log message
     @message = JSON.parse(message)
     keystroke = KeyStroke.from_character_and_modifier_flags(@message["characters"], @message["modifierFlags"])
 
@@ -166,39 +159,59 @@ class EventHandler
   #
   # Cutting
   #
-  def cut_backward() ["moveBackwardAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"] end
-  def cut_forward() ["moveForwardAndModifySelection:", "writeSelectionToPasteboard", "deleteForward:"] end
+  def cut_backward() ["moveBackwardAndModifySelection:", "copy", "deleteBackward:"] end
+  def cut_forward() ["moveForwardAndModifySelection:", "copy", "deleteForward:"] end
 
   # Which end of the selection we're modifying first matters. After hitting undo, we want
   # the cursor to end up where it was prior to this command.
   def cut_word_forward()
-    ["moveWordForward:", "moveWordBackwardAndModifySelection:", "writeSelectionToPasteboard",
+    ["moveWordForward:", "moveWordBackwardAndModifySelection:", "copy",
      "deleteForward:"]
   end
 
   def cut_word_backward()
-    ["moveWordBackwardAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
+    ["moveWordBackwardAndModifySelection:", "copy", "deleteBackward:"]
   end
 
   def cut_line()
-    ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
+    ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "copy", "deleteBackward:"]
   end
 
   def cut_to_beginning_of_line()
-    ["moveToBeginningOfLineAndModifySelection:", "writeSelectionToPasteboard", "deleteForward:"]
+    ["moveToBeginningOfLineAndModifySelection:", "copy", "deleteForward:"]
   end
 
   def cut_to_end_of_line()
-    ["moveToEndOfLineAndModifySelection:", "writeSelectionToPasteboard", "deleteBackward:"]
+    ["moveToEndOfLineAndModifySelection:", "copy", "deleteBackward:"]
+  end
+
+  #
+  # Copying
+  #
+  def copy_selection() ["copy"] end
+  def copy_forward() ["moveForwardAndModifySelection:", "copy"] + restore_cursor_position() end
+
+  # VIM will move your cursor to the left when you execute this copy.
+  def copy_backward() ["moveBackwardAndModifySelection:", "copy", "moveForward:", "moveBackward:"] end
+
+  def copy_word_forward() ["moveWordForwardAndModifySelection:", "copy"] + restore_cursor_position() end
+
+  # VIM will move your cursor to the left when you execute this copy.
+  def copy_word_backward()
+    ["moveWordBackwardAndModifySelection:", "copy"] + restore_cursor_position + ["moveWordBackward:"]
+  end
+
+  def copy_line()
+    ["moveToBeginningOfLine:", "moveToEndOfLineAndModifySelection:", "copy"] + restore_cursor_position()
   end
 
   #
   # Other
   #
-  def paste_before() ["readSelectionFromPasteboard", "moveForward:"] end
+  def paste_before() ["paste", "moveForward:"] end
 
   def paste_after()
-    (@message["hasSelection"] ? [] : ["moveForward:"]) + ["readSelectionFromPasteboard", "moveForward:"]
+    (@message["hasSelection"] ? [] : ["moveForward:"]) + ["paste", "moveForward:"]
   end
 
   def undo()
@@ -218,6 +231,10 @@ class EventHandler
      { "setSelection:column:" => [line + 1, column + 1] }, "moveForward:",
      { "scrollTo:" => [@message["scrollY"]] }]
   end
+
+  # Restores the cursor position to whatever it was when this command began executing. Useful for the copy
+  # commands, which modify the cursor position to build a selection to copy.
+  def restore_cursor_position() set_cursor_position(@message["line"], @message["column"]) end
 end
 
 def log(str)
@@ -238,6 +255,7 @@ if $0 == __FILE__
       log "response: #{response.inspect}"
     rescue => error
       log error.to_s
+      log error.backtrace.join("\n")
       response = []
     end
     puts response.to_json

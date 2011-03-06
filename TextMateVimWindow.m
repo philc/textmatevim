@@ -75,7 +75,7 @@ static NSNumber * columnNumber;
 
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"writeSelectionToPasteboard", @"noOp", @"readSelectionFromPasteboard",
+      @"enterMode:", @"addNewline", @"copy", @"noOp", @"paste",
       @"scrollTo:", @"setSelection:column:", @"undo", nil];
 
   if (commands.count > 0) {
@@ -123,7 +123,7 @@ static NSNumber * columnNumber;
  */
 - (void)noOp { }
 
-- (void)readSelectionFromPasteboard {
+- (void)paste {
   // readSelectionFromPasteboard will replace whatever's currently selected.
   [[self firstResponder] readSelectionFromPasteboard:[NSPasteboard generalPasteboard]];
 }
@@ -151,7 +151,7 @@ static NSNumber * columnNumber;
     [cursorView setMode: mode];
 }
 
-- (void)writeSelectionToPasteboard {
+- (void)copy {
   [[self firstResponder] writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
       types:[NSArray arrayWithObject:@"NSStringPboardType"]];
 }
