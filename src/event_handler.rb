@@ -15,7 +15,7 @@ class EventHandler
   UNDO_STACK_SIZE = 3
 
   MUTATING_COMMANDS = %W(cut_backward cut_forward cut_word_forward cut_word_backward cut_line
-       cut_to_beginning_of_line cut_to_end_of_line)
+       cut_to_beginning_of_line cut_to_end_of_line paste_before paste_after)
 
   def initialize
     self.current_mode = :insert
@@ -186,6 +186,12 @@ class EventHandler
   #
   # Other
   #
+  def paste_before() ["readSelectionFromPasteboard", "moveForward:"] end
+
+  def paste_after()
+    (@message["hasSelection"] ? [] : ["moveForward:"]) + ["readSelectionFromPasteboard", "moveForward:"]
+  end
+
   def undo()
     # If we're undoing a previous command which mutated the document, restore the user's cursor position.
     saved_state = previous_command_stack.pop

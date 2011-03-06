@@ -14,6 +14,8 @@ mode(:command, :visual) do
   map "o", "insert_newline_below"
 
   # Other
+  map "p", "paste_after"
+  map "P", "paste_before"
   map "u", "undo"
 end
 
@@ -27,7 +29,7 @@ mode(:command) do
   map "b", "move_word_backward"
   map "w", "move_word_forward"
   map "e", "move_to_end_of_word"
-
+  
   map "0", "move_to_beginning_of_line"
   map "$", "move_to_end_of_line"
 

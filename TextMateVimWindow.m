@@ -75,7 +75,7 @@ static NSNumber * columnNumber;
 
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"writeSelectionToPasteboard", @"noOp",
+      @"enterMode:", @"addNewline", @"writeSelectionToPasteboard", @"noOp", @"readSelectionFromPasteboard",
       @"scrollTo:", @"setSelection:column:", @"undo", nil];
 
   if (commands.count > 0) {
@@ -122,6 +122,11 @@ static NSNumber * columnNumber;
  * These are commands that the Ruby event handler can invoke.
  */
 - (void)noOp { }
+
+- (void)readSelectionFromPasteboard {
+  // readSelectionFromPasteboard will replace whatever's currently selected.
+  [[self firstResponder] readSelectionFromPasteboard:[NSPasteboard generalPasteboard]];
+}
 
 - (void)setSelection:(NSNumber *)line column:(NSNumber *)column {
   [[self firstResponder] selectToLine:line andColumn:column];
