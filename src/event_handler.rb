@@ -46,12 +46,13 @@ class EventHandler
         result
       else
         raise "Unrecognized command: #{command}"
-        []
       end
     elsif key_queue_contains_partial_command?
       no_op_command()
     else
-      [] # the key will pass through to TextMate.
+      # This key is not bound to any command. If it's insert mode, pass it through.
+      should_pass_through = (self.current_mode == :insert || keystroke.modifiers.include?("M"))
+      should_pass_through ? [] : no_op_command
     end
   end
 

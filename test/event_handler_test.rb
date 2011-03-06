@@ -37,6 +37,26 @@ class EventHandlerTest < Test::Unit::TestCase
       assert_equal :visual, @event_handler.current_mode
     end
 
+    context "passing through keystrokes" do
+      should "not let unbound keys pass through in command mode" do
+        @event_handler.current_mode = :command
+        stub_keymap(:command => {})
+        assert_equal ["noOp"], type_key("v")
+      end
+
+      should "let unbound keys with the CMD modifier pass through in command mode" do
+        @event_handler.current_mode = :command
+        stub_keymap(:command => {})
+        assert_equal [], type_key("<M-c>")
+      end
+
+      should "let unbound keys pass through in insert mode" do
+        @event_handler.current_mode = :insert
+        stub_keymap(:insert => {})
+        assert_equal [], type_key("v")
+      end
+    end
+
     should "queue up keystrokes and execute commands composed of multiple keystrokes" do
       @event_handler.current_mode = :command
       stub_keymap(:command => { "gg" => "move_to_beginning_of_document" })
@@ -53,7 +73,9 @@ class EventHandlerTest < Test::Unit::TestCase
     end
   end
 
-  def type_key(key)
-    @event_handler.handle_key_message({ :characters => key, :modifierFlags => 0 }.to_json)
+  def type_key(key_string)
+    keystroke = KeyStroke.from_string(key_string)
+    @event_handler.handle_key_message(
+        { :characters => keystroke.key, :modifierFlags => keystroke.modifier_flags }.to_json)
   end
 end
