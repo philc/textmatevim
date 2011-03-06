@@ -121,6 +121,26 @@ class EventHandler
   def move_to_beginning_of_document() ["moveToBeginningOfDocument:"] end
   def move_to_end_of_document() ["moveToEndOfDocument:"] end
 
+  # Movement + selection
+  def select_backward() ["moveBackwardAndModifySelection:"] end
+  def select_forward() ["moveForwardAndModifySelection:"] end
+  def select_down() ["moveDownAndModifySelection:"] end
+  def select_up() ["moveUpAndModifySelection:"] end
+
+  def select_half_page_down() ["moveDownAndModifySelection:"] * 6 end
+  def select_half_page_up() ["moveUpAndModifySelection:"] * 6 end
+
+  def select_word_backward() ["moveWordBackwardAndModifySelection:"] end
+  def select_word_forward() ["moveWordForwardAndModifySelection:"] end
+  def select_to_end_of_word() ["moveToEndOfWordAndModifySelection:"] end
+
+  def select_to_beginning_of_line() ["moveToBeginningOfLineAndModifySelection:"] end
+  def select_to_end_of_line() ["moveToEndOfLineAndModifySelection:"] end
+
+  def select_to_beginning_of_document() ["moveToBeginningOfDocumentAndModifySelection:"] end
+  def select_to_end_of_document() ["moveToEndOfDocumentAndModifySelection:"] end
+  
+
   #
   # Insertion
   #

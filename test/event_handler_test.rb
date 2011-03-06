@@ -30,6 +30,13 @@ class EventHandlerTest < Test::Unit::TestCase
       assert_equal :command, @event_handler.current_mode
     end
 
+    should "transition to visual mode from command mode" do
+      @event_handler.current_mode = :command
+      stub_keymap(:command => { "v" => "enter_visual_mode" })
+      type_key "v"
+      assert_equal :visual, @event_handler.current_mode
+    end
+
     should "queue up keystrokes and execute commands composed of multiple keystrokes" do
       @event_handler.current_mode = :command
       stub_keymap(:command => { "gg" => "move_to_beginning_of_document" })
