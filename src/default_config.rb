@@ -73,6 +73,9 @@ mode(:visual) do
 
   map "<C-d>", "select_half_page_down"
   map "<C-u>", "select_half_page_up"
+
+  map "x", ["cut_forward", "enter_command_mode"]
+  map "dl", ["cut_forward", "enter_command_mode"]
 end
 
 mode(:insert) do

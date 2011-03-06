@@ -23,30 +23,38 @@ class EventHandler
     self.previous_command_stack = []
   end
 
+  # Executes a single command and returns the response which should be sent to textmate.
+  def execute_command(command)
+    raise "Unrecognized command: #{command}" unless self.respond_to?(command.to_sym)
+    self.key_queue = []
+    result = self.send(command.to_sym)
+    # When executing commands which modify the document, keep track of the original cursor position
+    # so we can restore it when we unwind these commands via undo.
+    if MUTATING_COMMANDS.include?(command)
+      previous_command_stack.push(
+          { :command => command, :line => @message["line"], :column => @message["column"]})
+      previous_command_stack.shift if previous_command_stack.size > UNDO_STACK_SIZE
+    end
+    result
+  end
+
   def handle_key_message(message)
+    if $modified_time != File.stat(SOURCE_PATH)
+      $modified_time = File.stat(SOURCE_PATH)
+      load(SOURCE_PATH)
+      return handle_key_message(message)
+    end
+
+    log message
     @message = JSON.parse(message)
     keystroke = KeyStroke.from_character_and_modifier_flags(@message["characters"], @message["modifierFlags"])
 
     key_queue.push(keystroke.to_s)
     key_queue.shift if key_queue.size > KEY_QUEUE_LIMIT
 
-    command = command_for_key_queue()
-
-    if command
-      if self.respond_to?(command.to_sym)
-        self.key_queue = []
-        result = self.send(command.to_sym)
-        # When executing commands which modify the document, keep track of the original cursor position
-        # so we can restore it when we unwind these commands via undo.
-        if MUTATING_COMMANDS.include?(command)
-          previous_command_stack.push(
-              { :command => command, :line => @message["line"], :column => @message["column"]})
-          previous_command_stack.shift if previous_command_stack.size > UNDO_STACK_SIZE
-        end
-        result
-      else
-        raise "Unrecognized command: #{command}"
-      end
+    commands = commands_for_key_queue()
+    if commands.size > 0
+      commands.map { |command| execute_command(command) }.flatten
     elsif key_queue_contains_partial_command?
       no_op_command()
     else
@@ -56,14 +64,15 @@ class EventHandler
     end
   end
 
-  # Returns the user specified command matching the current queue of keys.
-  def command_for_key_queue
+  # Returns the user specified command matching the current queue of keys. Multiple commands can be specified
+  # as the target of a keybinding (e.g. "h" => ["move_forward", "cut_forward"])
+  def commands_for_key_queue
     (0).upto(self.key_queue.size - 1) do |i|
       key_sequence = self.key_queue[i..-1]
-      command = KeyMap.user_keymap[self.current_mode][key_sequence.map(&:to_s).join]
-      return command if command
+      commands = Array(KeyMap.user_keymap[self.current_mode][key_sequence.map(&:to_s).join])
+      return commands unless commands.empty?
     end
-    nil
+    []
   end
 
   # Whether any part of the current queue of keys constitutes the beginning (prefix) of a longer user command.

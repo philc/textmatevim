@@ -6,13 +6,18 @@ class EventHandlerTest < Test::Unit::TestCase
     KeyMap.stubs(:user_keymap).returns(keymap)
   end
 
+  def setup
+    @event_handler = EventHandler.new
+    @event_handler.current_mode = :command
+  end
+
   context "stubbed keymap" do
     setup do
       stub_keymap({ :insert => { "h" => "move_backward" } })
-      @event_handler = EventHandler.new
     end
 
     should "respond with the correct command from the user's keymap" do
+      @event_handler.current_mode = :insert
       assert_equal ["moveBackward:"], type_key("h")
     end
 
@@ -57,8 +62,12 @@ class EventHandlerTest < Test::Unit::TestCase
       end
     end
 
+    should "execute multiple commands if more than one is specified as the target of a user's key mapping" do
+      stub_keymap(:command => { "q" => ["move_forward", "move_backward"] })
+      assert_equal ["moveForward:", "moveBackward:"], type_key("q")
+    end
+
     should "queue up keystrokes and execute commands composed of multiple keystrokes" do
-      @event_handler.current_mode = :command
       stub_keymap(:command => { "gg" => "move_to_beginning_of_document" })
       # The first key should result in a noOp, because it might turn out to be part of the "gg" command.
       assert_equal ["noOp"], type_key("g")
