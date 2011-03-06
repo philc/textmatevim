@@ -9,6 +9,6 @@
 - (void)sendEvent:(NSEvent *)theEvent;
 - (void)enterMode;
 - (NSPoint)getScrollPosition:(NSView *)view;
-
+- (NSView *)oakTextView;
 
 @end

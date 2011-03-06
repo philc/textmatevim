@@ -23,13 +23,13 @@ static NSNumber * columnNumber;
  */
 - (void)setFocusedWindow:(NSWindow *)theWindow {
   if (currentWindow != nil) {
-    [[currentWindow firstResponder] unbind:@"lineNumber"];
-    [[currentWindow firstResponder] unbind:@"columnNumber"];
+    [self.oakTextView unbind:@"lineNumber"];
+    [self.oakTextView unbind:@"columnNumber"];
   }
 
   currentWindow = self;
   currentMode = currentMode ? currentMode : @"insert";
-  id responder = [self firstResponder];
+  id responder = self.oakTextView;
 
   if (cursorView)
     [cursorView removeFromSuperview];
@@ -53,14 +53,13 @@ static NSNumber * columnNumber;
   if (self != currentWindow)
     [self setFocusedWindow:self];
 
-  id oakTextView = [self firstResponder];
   NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
       event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
       lineNumber, @"line",
       columnNumber, @"column",
-      [NSNumber numberWithBool: [oakTextView hasSelection]], @"hasSelection",
-      [NSNumber numberWithFloat: [self getScrollPosition: oakTextView].y], @"scrollY",
+      [NSNumber numberWithBool: [self.oakTextView hasSelection]], @"hasSelection",
+      [NSNumber numberWithFloat: [self getScrollPosition: self.oakTextView].y], @"scrollY",
       nil];
   fputs([[dict JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
   fputs("\n", [TextMateVimPlugin eventRouterStdin]);
@@ -111,12 +110,15 @@ static NSNumber * columnNumber;
       }
       else
         // Pass the command on to Textmate's OakTextView.
-        [oakTextView performSelector: NSSelectorFromString(command) withObject: self];
+        [self.oakTextView performSelector: NSSelectorFromString(command) withObject: self];
     }
   } else {
     [super sendEvent: event];
   }
 }
+
+// OakTextView is Textmate's text editor implementation.
+- (NSView *)oakTextView { return (NSView *)self.oakTextView; }
 
 /*
  * These are commands that the Ruby event handler can invoke.
@@ -125,25 +127,25 @@ static NSNumber * columnNumber;
 
 - (void)paste {
   // readSelectionFromPasteboard will replace whatever's currently selected.
-  [[self firstResponder] readSelectionFromPasteboard:[NSPasteboard generalPasteboard]];
+  [self.oakTextView readSelectionFromPasteboard:[NSPasteboard generalPasteboard]];
 }
 
 - (void)setSelection:(NSNumber *)line column:(NSNumber *)column {
-  [[self firstResponder] selectToLine:line andColumn:column];
+  [self.oakTextView selectToLine:line andColumn:column];
 }
 
 /* Scrolls the OakTextView to the given Y coordinate. TODO(philc): Support X as well. */
 - (void)scrollTo:(NSNumber *)y {
-  NSPoint scrollPosition = [self getScrollPosition: (NSView *)[self firstResponder]];
+  NSPoint scrollPosition = [self getScrollPosition: (NSView *)self.oakTextView];
   scrollPosition.y = y.floatValue;
-  [[self firstResponder] scrollPoint: scrollPosition];
+  [self.oakTextView scrollPoint: scrollPosition];
 }
 
-- (void)addNewline { [[self firstResponder] insertText:@"\n"]; }
+- (void)addNewline { [self.oakTextView insertText:@"\n"]; }
 
 /* NOTE(philc): I'm not sure what this argument is supposed to be to undo, but using 0 causes the last
  * action to be undone, which is precisely what we need. */
-- (void)undo { [[self firstResponder] undo:0]; }
+- (void)undo { [self.oakTextView undo:0]; }
 
 - (void)enterMode:(NSString *)mode {
   currentMode = mode;
@@ -152,7 +154,7 @@ static NSNumber * columnNumber;
 }
 
 - (void)copy {
-  [[self firstResponder] writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
+  [self.oakTextView writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
       types:[NSArray arrayWithObject:@"NSStringPboardType"]];
 }
 
