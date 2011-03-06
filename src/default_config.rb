@@ -20,6 +20,8 @@ mode(:command, :visual) do
 end
 
 mode(:command) do
+  map "v", "enter_visual_mode"
+
   # Movement
   map "h", "move_backward"
   map "l", "move_forward"
@@ -57,7 +59,9 @@ mode(:command) do
   map "yw", "copy_word_forward"
   map "yb", "copy_word_backward"
 
-  map "v", "enter_visual_mode"
+  # Tabs
+  map "J", "next_tab"
+  map "K", "previous_tab"
 end
 
 mode(:visual) do

@@ -7,8 +7,10 @@
 - (void)addNewline;
 + (BOOL)isValidWindowType:(NSWindow *)theWindow;
 - (void)sendEvent:(NSEvent *)theEvent;
-- (void)enterMode;
+- (void)enterMode:(NSString *)mode;
 - (NSPoint)getScrollPosition:(NSView *)view;
 - (NSView *)oakTextView;
+- (void)copySelection;
+- (id)oakTabBarView;
 
 @end

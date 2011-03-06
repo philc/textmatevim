@@ -159,51 +159,60 @@ class EventHandler
   #
   # Cutting
   #
-  def cut_backward() ["moveBackwardAndModifySelection:", "copy", "deleteBackward:"] end
-  def cut_forward() ["moveForwardAndModifySelection:", "copy", "deleteForward:"] end
+  def cut_backward() ["moveBackwardAndModifySelection:", "copySelection", "deleteBackward:"] end
+  def cut_forward() ["moveForwardAndModifySelection:", "copySelection", "deleteForward:"] end
 
   # Which end of the selection we're modifying first matters. After hitting undo, we want
   # the cursor to end up where it was prior to this command.
   def cut_word_forward()
-    ["moveWordForward:", "moveWordBackwardAndModifySelection:", "copy",
+    ["moveWordForward:", "moveWordBackwardAndModifySelection:", "copySelection",
      "deleteForward:"]
   end
 
   def cut_word_backward()
-    ["moveWordBackwardAndModifySelection:", "copy", "deleteBackward:"]
+    ["moveWordBackwardAndModifySelection:", "copySelection", "deleteBackward:"]
   end
 
   def cut_line()
-    ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "copy", "deleteBackward:"]
+    ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "copySelection", "deleteBackward:"]
   end
 
   def cut_to_beginning_of_line()
-    ["moveToBeginningOfLineAndModifySelection:", "copy", "deleteForward:"]
+    ["moveToBeginningOfLineAndModifySelection:", "copySelection", "deleteForward:"]
   end
 
   def cut_to_end_of_line()
-    ["moveToEndOfLineAndModifySelection:", "copy", "deleteBackward:"]
+    ["moveToEndOfLineAndModifySelection:", "copySelection", "deleteBackward:"]
   end
 
   #
   # Copying
   #
-  def copy_selection() ["copy"] end
-  def copy_forward() ["moveForwardAndModifySelection:", "copy"] + restore_cursor_position() end
+  def copy_selection() ["copySelection"] end
+  def copy_forward() ["moveForwardAndModifySelection:", "copySelection"] + restore_cursor_position() end
 
   # VIM will move your cursor to the left when you execute this copy.
-  def copy_backward() ["moveBackwardAndModifySelection:", "copy", "moveForward:", "moveBackward:"] end
+  def copy_backward()
+    ["moveBackwardAndModifySelection:", "copySelection", "moveForward:", "moveBackward:"]
+  end
 
-  def copy_word_forward() ["moveWordForwardAndModifySelection:", "copy"] + restore_cursor_position() end
+  def copy_word_forward() ["moveWordForwardAndModifySelection:", "copySelection"] + restore_cursor_position() end
 
   # VIM will move your cursor to the left when you execute this copy.
   def copy_word_backward()
-    ["moveWordBackwardAndModifySelection:", "copy"] + restore_cursor_position + ["moveWordBackward:"]
+    ["moveWordBackwardAndModifySelection:", "copySelection"] + restore_cursor_position + ["moveWordBackward:"]
   end
 
   def copy_line()
-    ["moveToBeginningOfLine:", "moveToEndOfLineAndModifySelection:", "copy"] + restore_cursor_position()
+    ["moveToBeginningOfLine:", "moveToEndOfLineAndModifySelection:", "copySelection"] +
+        restore_cursor_position()
   end
+
+  #
+  # Tabs
+  #
+  def next_tab() ["nextTab"] end
+  def previous_tab() ["previousTab"] end
 
   #
   # Other

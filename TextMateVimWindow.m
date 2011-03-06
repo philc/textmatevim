@@ -29,18 +29,17 @@ static NSNumber * columnNumber;
 
   currentWindow = self;
   currentMode = currentMode ? currentMode : @"insert";
-  id responder = self.oakTextView;
 
   if (cursorView)
     [cursorView removeFromSuperview];
-  cursorView = [[CommandModeCursor alloc] initWithFrame:[responder bounds]];
-  [responder addSubview:cursorView];
+  cursorView = [[CommandModeCursor alloc] initWithFrame:[self.oakTextView bounds]];
+  [self.oakTextView addSubview:cursorView];
   [cursorView setMode:currentMode];
 
   // NOTE(philc): For some reason these values are only available via binding. There are no methods on
   // OakTextView for lineNumber and columnNumber.
-  [responder bind:@"lineNumber" toObject:self withKeyPath:@"lineNumber" options:nil];
-  [responder bind:@"columnNumber" toObject:self withKeyPath:@"columnNumber" options:nil];
+  [self.oakTextView bind:@"lineNumber" toObject:self withKeyPath:@"lineNumber" options:nil];
+  [self.oakTextView bind:@"columnNumber" toObject:self withKeyPath:@"columnNumber" options:nil];
 }
 
 - (void)sendEvent:(NSEvent *)event {
@@ -74,8 +73,9 @@ static NSNumber * columnNumber;
 
   NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"copy", @"noOp", @"paste",
-      @"scrollTo:", @"setSelection:column:", @"undo", nil];
+      @"enterMode:", @"addNewline", @"copySelection", @"noOp", @"paste",
+      @"scrollTo:", @"setSelection:column:", @"undo",
+      @"nextTab", @"previousTab", nil];
 
   if (commands.count > 0) {
 
@@ -117,9 +117,6 @@ static NSNumber * columnNumber;
   }
 }
 
-// OakTextView is Textmate's text editor implementation.
-- (NSView *)oakTextView { return (NSView *)self.oakTextView; }
-
 /*
  * These are commands that the Ruby event handler can invoke.
  */
@@ -153,10 +150,25 @@ static NSNumber * columnNumber;
     [cursorView setMode: mode];
 }
 
-- (void)copy {
+- (void)nextTab {
+  id tabBar = self.oakTabBarView;
+  if (tabBar)
+    [tabBar selectNextTab:nil];
+}
+
+- (void)previousTab {
+  id tabBar = self.oakTabBarView;
+  if (tabBar)
+    [tabBar selectPreviousTab:nil];
+}
+
+- (void)copySelection {
   [self.oakTextView writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
       types:[NSArray arrayWithObject:@"NSStringPboardType"]];
 }
+
+- (NSNumber *)lineNumber { return lineNumber; }
+- (NSNumber *)columnNumber { return columnNumber; }
 
 - (void)setLineNumber:(id)theLineNumber {
   if (lineNumber)
@@ -164,9 +176,6 @@ static NSNumber * columnNumber;
   lineNumber = theLineNumber;
   [lineNumber retain];
 }
-
-- (NSNumber *)lineNumber { return lineNumber; }
-
 - (void)setColumnNumber:(id)theColumnNumber {
   if (columnNumber)
     [columnNumber release];
@@ -174,9 +183,26 @@ static NSNumber * columnNumber;
   [columnNumber retain];
 }
 
-- (NSNumber *)columnNumber { return columnNumber; }
-
 /* For the given NSView, retrieves its scroll position. */
 - (NSPoint)getScrollPosition:(NSView *)view { return view.enclosingScrollView.documentVisibleRect.origin; }
+
+// OakTextView is Textmate's text editor implementation.
+- (NSView *)oakTextView { return (NSView *)self.firstResponder; }
+
+// The TabBarView which controls the tabs for the current window. nil if only a single file is being edited.
+- (id)oakTabBarView {
+  NSView * current = self.oakTextView;
+  while (current && current.superview &&
+      ![current.superview isKindOfClass: NSClassFromString(@"NSThemeFrame")])
+    current = current.superview;
+  if (!current)
+    return nil;
+  for (int i = 0; i < current.subviews.count; i++) {
+    id subview = [current.subviews objectAtIndex:i];
+    if ([subview isKindOfClass: NSClassFromString(@"OakTabBarView")])
+      return subview;
+  }
+  return nil;
+}
 
 @end
