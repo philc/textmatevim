@@ -13,4 +13,7 @@
 - (void)copySelection;
 - (id)oakTabBarView;
 
+- (void)nextTab;
+- (void)previousTab;
+
 @end
