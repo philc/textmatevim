@@ -84,7 +84,9 @@ class EventHandlerTest < Test::Unit::TestCase
 
   def type_key(key_string)
     keystroke = KeyStroke.from_string(key_string)
-    @event_handler.handle_key_message(
-        { :characters => keystroke.key, :modifierFlags => keystroke.modifier_flags }.to_json)
+    @event_handler.handle_message({
+      :message => "keydown",
+      :characters => keystroke.key,
+      :modifierFlags => keystroke.modifier_flags }.to_json)
   end
 end

@@ -1,7 +1,10 @@
 #import "TextMateVimPlugin.h"
 #import "TextMateVimWindow.h"
+#import <JSON/JSON.h>
 
 @implementation TextMateVimPlugin
+
+int MAX_JSON_MESSAGE_SIZE = 8096;
 
 // Pipes to the event router process, written in Ruby.
 static FILE * eventRouterStdin;
@@ -65,8 +68,8 @@ static FILE * eventRouterStdout;
   fputs("\n", [TextMateVimPlugin eventRouterStdin]);
   fflush([TextMateVimPlugin eventRouterStdin]);
 
-  char response[1024];
-  if (fgets(response, 1024, [TextMateVimPlugin eventRouterStdout]) == NULL) {
+  char response[MAX_JSON_MESSAGE_SIZE];
+  if (fgets(response, MAX_JSON_MESSAGE_SIZE, [TextMateVimPlugin eventRouterStdout]) == NULL) {
     NSLog(@"%Unable to read response from event_handler.rb!");
     return nil;
   } else {

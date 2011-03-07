@@ -4,7 +4,6 @@
 #import "TextMateVimWindow.h"
 #import "TextMateVimPlugin.h"
 #import "CommandModeCursor.h"
-#import <JSON/JSON.h>
 
 @implementation TextMateVimWindow
 
@@ -58,6 +57,7 @@ static NSNumber * columnNumber;
     [self setFocusedWindow:self];
 
   NSDictionary * messageBody = [NSDictionary dictionaryWithObjectsAndKeys:
+      @"keydown", @"message",
       event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
       lineNumber, @"line",

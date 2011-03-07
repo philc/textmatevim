@@ -39,8 +39,16 @@ class EventHandler
     result
   end
 
-  def handle_key_message(message)
-    @message = JSON.parse(message)
+  def handle_message(message)
+    message_json = JSON.parse(message)
+
+    if (message_json["message"] == "keydown")
+      handle_keydown_message(message_json)
+    end
+  end
+
+  def handle_keydown_message(message)
+    @message = message
     keystroke = KeyStroke.from_character_and_modifier_flags(@message["characters"], @message["modifierFlags"])
 
     key_queue.push(keystroke.to_s)
@@ -272,7 +280,7 @@ if $0 == __FILE__
   while message = STDIN.gets
     response = []
     begin
-      response = event_handler.handle_key_message(message)
+      response = event_handler.handle_message(message)
       log "response: #{response.inspect}"
     rescue => error
       log error.to_s
