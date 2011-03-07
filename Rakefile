@@ -2,14 +2,14 @@ require 'pathname'
 
 APPNAME = "TextMateVim"
 DEV_TEXTMATE = ENV["DevTextMate"] || "/Applications/DevTextMate.app/Contents/MacOS/DevTextMate"
-CONFIGURATION = ENV['Configuration'] || 'Debug'
+$configuration = ENV['Configuration'] || 'Debug'
 
 task :default => :test
 task :run => :build
 
 task :build do
   # Textmate is currently built against i386, and so must our plugin be.
-  sh "xcodebuild -configuration #{CONFIGURATION} ARCHS='i386'"
+  sh "xcodebuild -configuration #{$configuration} ARCHS='i386'"
 end
 
 task :run do
@@ -21,9 +21,6 @@ task :test do |task|
     sh "ruby #{filename}"
   end
 end
-
-# We open this file in textmate to play around with the editing features of our plugin.
-SAMPLE_FILE = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + "My baloney has a first name, it's HOMER\n" * 20
 
 desc "Launches a development version of textmate, with TextMateVim active"
 task :launch => :build
@@ -39,7 +36,17 @@ task :launch do
   `#{DEV_TEXTMATE} /tmp/sample_file`
 end
 
+task :release_bundle do
+  $configuration = "Release"
+  Rake::Task["build"].invoke
+  `mv "build/release/#{APPNAME}.bundle" "build/release/#{APPNAME}.tmplugin"`
+  `zip -r build/release/#{APPNAME}.tmbundle.zip build/release/#{APPNAME}.tmplugin`
+end
+
 def kill_process(name)
   pid = `ps ax | grep #{name} | grep -v grep`.split(" ")[0]
   sh "kill -9 #{pid}" if pid
 end
+
+# We open this file in textmate to play around with the editing features of our plugin.
+SAMPLE_FILE = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + "My baloney has a first name, it's HOMER\n" * 20
