@@ -6,6 +6,8 @@ require "keystroke"
 require "keymap"
 require "ui_helper"
 
+ENABLE_DEBUG_LOGGING = false
+
 class EventHandler
   attr_accessor :current_mode, :key_queue, :previous_command_stack
   # TODO(philc): This limit should be based on the longest of the user's mapped commands.
@@ -288,8 +290,10 @@ def log(str)
   file = File.open("/tmp/event_handler.log", "a") { |file| file.puts(str) }
 end
 
+def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
+  
 if $0 == __FILE__
-  log "TextMateVim event_handler coprocess is online."
+  log "TextMateVim event_handler.rb coprocess is online."
 
   load "default_config.rb"
   load_user_config_file
@@ -298,7 +302,7 @@ if $0 == __FILE__
     response = []
     begin
       response = event_handler.handle_message(message)
-      log "response: #{response.inspect}"
+      debug_log "response: #{response.inspect}"
     rescue => error
       log error.to_s
       log error.backtrace.join("\n")
