@@ -26,14 +26,14 @@ module KeyMap
     keystroke_string = keystroke_string.dup
     while keystroke_string.size > 0
       char = keystroke_string[0].chr
-      if char != "<"
-        keystrokes.push(KeyStroke.from_string(char))
-        keystroke_string = keystroke_string[1..-1]
-      elsif char == "<"
+      if (char == "<" && keystroke_string.size > 1)
         i = keystroke_string.index(">")
         raise "Invalid key mapping" unless i
         keystrokes.push(KeyStroke.from_string(keystroke_string[0..i]))
         keystroke_string = keystroke_string[(i + 1)..-1] || ""
+      else
+        keystrokes.push(KeyStroke.from_string(char))
+        keystroke_string = keystroke_string[1..-1]
       end
     end
     keystrokes

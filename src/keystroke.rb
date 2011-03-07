@@ -22,7 +22,9 @@ class KeyStroke
     "tab" => "\t",
     "space" => " ",
     "esc" => "\e",
-    "backspace" => "\b"
+    "backspace" => "\b",
+    "lt" => "<",
+    "gt" => ">"
   }
   @@key_to_readable = @@readable_to_key.invert
 

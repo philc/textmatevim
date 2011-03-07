@@ -88,6 +88,10 @@ class EventHandlerTest < Test::Unit::TestCase
     should "parse out multiple keystrokes from a string" do
       assert_equal "x<C-M-y>Z", KeyMap.keystrokes_from_string("x<M-C-y>Z").map(&:to_s).join
     end
+
+    should "parse out < as a special keystroke" do
+      assert_equal "<lt>", KeyMap.keystrokes_from_string("<lt>").map(&:to_s).join
+    end
   end
 
   def type_key(key_string)
