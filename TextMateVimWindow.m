@@ -8,6 +8,7 @@
 
 @implementation TextMateVimWindow
 
+static BOOL firstTimeInitialization = false;
 static TextMateVimWindow * currentWindow;
 static CommandModeCursor * cursorView;
 static NSString * currentMode;
@@ -22,6 +23,10 @@ static NSNumber * columnNumber;
  * When a different window gets focused, we must add our cursor view to it and register a few bindings.
  */
 - (void)setFocusedWindow:(NSWindow *)theWindow {
+  if (!firstTimeInitialization) {
+    firstTimeInitialization = true;
+    [self removeMenuItemShortcuts];
+  }
   if (currentWindow != nil) {
     [self.oakTextView unbind:@"lineNumber"];
     [self.oakTextView unbind:@"columnNumber"];
@@ -193,16 +198,35 @@ static NSNumber * columnNumber;
 - (id)oakTabBarView {
   NSView * current = self.oakTextView;
   while (current && current.superview &&
-      ![current.superview isKindOfClass: NSClassFromString(@"NSThemeFrame")])
+      ![current.superview isKindOfClass:NSClassFromString(@"NSThemeFrame")])
     current = current.superview;
   if (!current)
     return nil;
   for (int i = 0; i < current.subviews.count; i++) {
     id subview = [current.subviews objectAtIndex:i];
-    if ([subview isKindOfClass: NSClassFromString(@"OakTabBarView")])
+    if ([subview isKindOfClass:NSClassFromString(@"OakTabBarView")])
       return subview;
   }
   return nil;
+}
+
+- (void)removeMenuItemShortcuts {
+  NSMutableArray * submenus = [NSMutableArray arrayWithCapacity: 30];
+  [submenus addObject:self.menu];
+
+  while (submenus.count > 0) {
+    NSMenu * submenu = [submenus objectAtIndex:0];
+    [submenus removeObjectAtIndex:0];
+
+    for (int i = 0; i < submenu.numberOfItems; i++) {
+      NSMenuItem * menuItem = [submenu itemAtIndex: i];
+      if (menuItem.submenu)
+        [submenus addObject: menuItem.submenu];
+
+      if ([menuItem.title isEqualToString: @"to Uppercase"])
+        [menuItem setKeyEquivalent: @""];
+    }
+  }
 }
 
 @end
