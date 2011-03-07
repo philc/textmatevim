@@ -12,7 +12,7 @@
 - (NSView *)oakTextView;
 - (void)copySelection;
 - (id)oakTabBarView;
-
+- (void)removeMenuItemShortcutsWhichMatch:(NSArray *)keybindings;
 - (void)nextTab;
 - (void)previousTab;
 

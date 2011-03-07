@@ -40,12 +40,8 @@ class KeyStrokeTest < Test::Unit::TestCase
   end
 
   context "modifier_flags" do
-    should "have modifier_flags default to 256" do
-      assert_equal 256, @no_modifiers.modifier_flags
-    end
-
     should "OR together modifiers into a flags number" do
-      assert_equal 1179912, @cmd_shift_a.modifier_flags
+      assert_equal 1179648, @cmd_shift_a.modifier_flags
     end
   end
 end

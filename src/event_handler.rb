@@ -39,14 +39,19 @@ class EventHandler
     result
   end
 
+  # Handles a message from the Textmate process.
+  # - message: a JSON string, where message["message"] indiciates the type of message.
   def handle_message(message)
     message_json = JSON.parse(message)
-
-    if (message_json["message"] == "keydown")
-      handle_keydown_message(message_json)
+    case message_json["message"]
+    when "keydown": handle_keydown_message(message_json)
+    when "getKeybindings": handle_get_keybindings_message
     end
   end
 
+  # Interprets the keystroke event in light of the current mode.
+  # Returns a list of commands that TextMateVim should perform. The ["no_op"] command instructs TextMateVim
+  # to ignore the current keystroke. An empty list means to pass-through the keystroke.
   def handle_keydown_message(message)
     @message = message
     keystroke = KeyStroke.from_character_and_modifier_flags(@message["characters"], @message["modifierFlags"])
@@ -63,6 +68,18 @@ class EventHandler
       # This key is not bound to any command. If it's insert mode, pass it through.
       should_pass_through = (self.current_mode == :insert || keystroke.modifiers.include?("M"))
       should_pass_through ? [] : no_op_command
+    end
+  end
+
+  # Returns all keybindings for all modes that the user has mapped, in the form of:
+  # [[key, modifier_flags], ...] where modifier_flags is an int. These bindings will be used by TextMateVim
+  # to disable any Textmate menu items which conflict with the user's mapped keystrokes.
+  def handle_get_keybindings_message
+    keystroke_strings = KeyMap.user_keymap.map { |mode, bindings| bindings.keys }.flatten.uniq.sort
+    keystrokes = keystroke_strings.map { |string| KeyMap.keystrokes_from_string(string) }.flatten.uniq
+    keystrokes.map do |keystroke|
+      [keystroke.modifiers.include?("S") ? keystroke.key.upcase : keystroke.key,
+       keystroke.modifier_flags(false)]
     end
   end
 

@@ -11,7 +11,7 @@ class EventHandlerTest < Test::Unit::TestCase
     @event_handler.current_mode = :command
   end
 
-  context "stubbed keymap" do
+  context "when handling keydown events" do
     setup do
       stub_keymap({ :insert => { "h" => "move_backward" } })
     end
@@ -73,6 +73,14 @@ class EventHandlerTest < Test::Unit::TestCase
       assert_equal ["noOp"], type_key("g")
       assert_equal ["moveToBeginningOfDocument:"], type_key("g")
       assert_equal [], @event_handler.key_queue
+    end
+  end
+
+  context "get_keybindings" do
+    should "return a list of all registered keybindings across all modes" do
+      stub_keymap(:command => { "<C-y>" => "first command" }, :insert => { "Q" => "second command" })
+      result = @event_handler.handle_message({ :message => "getKeybindings" }.to_json)
+      assert_equal [["y", KeyStroke::ControlKeyMask], ["Q", 0]], result
     end
   end
 

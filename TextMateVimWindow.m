@@ -24,8 +24,11 @@ static NSNumber * columnNumber;
 - (void)setFocusedWindow:(NSWindow *)theWindow {
   if (!firstTimeInitialization) {
     firstTimeInitialization = true;
-    [self removeMenuItemShortcuts];
+    NSArray * keybindings = (NSArray *)[TextMateVimPlugin sendEventRouterMessage:
+        [NSDictionary dictionaryWithObjectsAndKeys: @"getKeybindings", @"message", nil]];
+    [self removeMenuItemShortcutsWhichMatch: keybindings];
   }
+
   if (currentWindow != nil) {
     [self.oakTextView unbind:@"lineNumber"];
     [self.oakTextView unbind:@"columnNumber"];
@@ -71,7 +74,7 @@ static NSNumber * columnNumber;
     return;
   }
 
-  NSArray * commands = result;
+  NSArray * commands = (NSArray *)result;
 
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
       @"enterMode:", @"addNewline", @"copySelection", @"noOp", @"paste",
@@ -206,21 +209,33 @@ static NSNumber * columnNumber;
   return nil;
 }
 
-- (void)removeMenuItemShortcuts {
-  NSMutableArray * submenus = [NSMutableArray arrayWithCapacity: 30];
+/*
+ * Given an array of shortcuts, iterates through all of the submenus in the app's menu bar and disables
+ * shortcuts for those menu items which conflict. This is to ensure that TextMateVim's keybindings (in
+ * particular CTRL+U) aren't swallowed by Textmate.
+ * shortcuts should be an array of the form: [[key, modifier_flags], ...]
+ */
+- (void)removeMenuItemShortcutsWhichMatch:(NSArray *)shortcuts {
+  NSMutableArray * submenus = [NSMutableArray arrayWithCapacity:30];
   [submenus addObject:self.menu];
 
   while (submenus.count > 0) {
     NSMenu * submenu = [submenus objectAtIndex:0];
     [submenus removeObjectAtIndex:0];
 
+    // NOTE(philc): This is currently O(N^2).
     for (int i = 0; i < submenu.numberOfItems; i++) {
-      NSMenuItem * menuItem = [submenu itemAtIndex: i];
+      NSMenuItem * menuItem = [submenu itemAtIndex:i];
       if (menuItem.submenu)
         [submenus addObject: menuItem.submenu];
-
-      if ([menuItem.title isEqualToString: @"to Uppercase"])
-        [menuItem setKeyEquivalent: @""];
+      for (int j = 0; j < shortcuts.count; j++) {
+        NSArray * keystroke = [shortcuts objectAtIndex:j];
+        if ([[keystroke objectAtIndex:0] isEqualToString:menuItem.keyEquivalent] &&
+            [[keystroke objectAtIndex:1] unsignedIntValue] == menuItem.keyEquivalentModifierMask) {
+          [menuItem setKeyEquivalent: @""];
+          break;
+        }
+      }
     }
   }
 }

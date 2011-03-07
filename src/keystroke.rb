@@ -73,11 +73,11 @@ class KeyStroke
     keystroke
   end
 
-  def modifier_flags
-    return 256 if modifiers.empty?
-    # When cocoa sends us events with modifiers, they have the 3rd bit set for some reason. Unclear why.
-    # Adding 8 to our modifier flags to match Cocoa's.
-    flags = 256 + 8
+  # Converts the key's modifiers to a bitmask, for use with Cocoa's key event APIs.
+  def modifier_flags(include_shift = true)
+    modifiers = self.modifiers.dup
+    modifiers.delete("S") unless include_shift
+    flags = 0
     modifiers.each { |modifier| flags = flags | MODIFIER_MAP[modifier] }
     flags
   end
