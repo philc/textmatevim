@@ -20,6 +20,7 @@ mode(:command, :visual) do
 end
 
 mode(:command) do
+  map "<esc>", "select_none"
   map "v", "enter_visual_mode"
 
   # Movement
