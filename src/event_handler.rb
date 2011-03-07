@@ -4,6 +4,7 @@ require "json"
 $LOAD_PATH.push(File.dirname(__FILE__) + "/")
 require "keystroke"
 require "keymap"
+require "ui_helper"
 
 class EventHandler
   attr_accessor :current_mode, :key_queue, :previous_command_stack
@@ -143,7 +144,6 @@ class EventHandler
   def select_to_beginning_of_document() ["moveToBeginningOfDocumentAndModifySelection:"] end
   def select_to_end_of_document() ["moveToEndOfDocumentAndModifySelection:"] end
   
-
   #
   # Insertion
   #
@@ -246,16 +246,28 @@ class EventHandler
   def restore_cursor_position() set_cursor_position(@message["line"], @message["column"]) end
 end
 
+# Loads the user's config file and shows a warning alert message if the file has trouble loading due to
+# a syntax error or invalid Ruby.
+def load_user_config_file
+  config_file_path = File.expand_path("~/.textmatevimrc")
+  return unless File.exists?(config_file_path)
+  begin
+    load(config_file_path)
+  rescue LoadError, StandardError => error
+    UiHelper.show_alert("Problem loading .textmatevimrc",
+        "There was a problem loading your ~/.textmatevimrc:\n\n" + error.to_s)
+  end
+end
+
 def log(str)
   file = File.open("/tmp/event_handler.log", "a") { |file| file.puts(str) }
 end
-
-log "loading event handler"
 
 if $0 == __FILE__
   log "TextMateVim event_handler coprocess is online."
 
   load "default_config.rb"
+  load_user_config_file
   event_handler = EventHandler.new
   while message = STDIN.gets
     response = []

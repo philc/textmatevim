@@ -10,6 +10,7 @@
 		0A77BE7B111FF36C006F0625 /* TextMateVimPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A77BE7A111FF36C006F0625 /* TextMateVimPlugin.m */; };
 		0A77BE8F111FF5B2006F0625 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BE8E111FF5B2006F0625 /* Cocoa.framework */; };
 		0A77BEB3111FFA4D006F0625 /* RubyCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */; };
+		6A709FCA13245B320064415D /* ui_helper.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A709FC913245B320064415D /* ui_helper.rb */; };
 		6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33E9131250B80029DE19 /* CommandModeCursor.m */; };
 		6ABA33EE131251490029DE19 /* NSColor_categories.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33ED131251490029DE19 /* NSColor_categories.m */; };
 		6ABE410D1313B263001CA6B4 /* default_config.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE41081313B263001CA6B4 /* default_config.rb */; };
@@ -29,6 +30,7 @@
 		0A77BE8E111FF5B2006F0625 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RubyCocoa.framework; path = System/Library/Frameworks/RubyCocoa.framework; sourceTree = SDKROOT; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		6A709FC913245B320064415D /* ui_helper.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = ui_helper.rb; sourceTree = "<group>"; };
 		6ABA33E8131250B80029DE19 /* CommandModeCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandModeCursor.h; path = src/CommandModeCursor.h; sourceTree = "<group>"; };
 		6ABA33E9131250B80029DE19 /* CommandModeCursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommandModeCursor.m; path = src/CommandModeCursor.m; sourceTree = "<group>"; };
 		6ABA33EC131251490029DE19 /* NSColor_categories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColor_categories.h; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 		6ABE41051313B263001CA6B4 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6A709FC913245B320064415D /* ui_helper.rb */,
 				6ABE41081313B263001CA6B4 /* default_config.rb */,
 				6ABE41091313B263001CA6B4 /* event_handler.rb */,
 				6ABE410A1313B263001CA6B4 /* keymap.rb */,
@@ -188,6 +191,7 @@
 				6ABE410E1313B263001CA6B4 /* event_handler.rb in Resources */,
 				6ABE410F1313B263001CA6B4 /* keymap.rb in Resources */,
 				6ABE41101313B263001CA6B4 /* keystroke.rb in Resources */,
+				6A709FCA13245B320064415D /* ui_helper.rb in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
