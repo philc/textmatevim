@@ -16,7 +16,9 @@ static FILE * eventRouterStdout;
   int pid = [TextMateVimPlugin startEventRouter];
   NSLog(@"Ruby process ID: %i", pid);
 
-  [TextMateVimWindow poseAsClass:[NSWindow class]];
+  // "poseAsClass" has been deprecated, but it still works. Use performSelector to avoid compiler
+  // warnings and errors.
+  [TextMateVimWindow performSelector: NSSelectorFromString(@"poseAsClass:") withObject: [NSWindow class]];
   return [super init];
 }
 
