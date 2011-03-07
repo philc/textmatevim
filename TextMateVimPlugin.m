@@ -56,4 +56,22 @@ static FILE * eventRouterStdout;
   return pid;
 }
 
+/*
+ * Sends a message to the Ruby event router process. The result will be deserialized from JSON; it can
+ * be an NSArray, NSDictionary, or nil.
+ */
++ (NSObject *)sendEventRouterMessage:(NSDictionary *)messageBody {
+  fputs([[messageBody JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
+  fputs("\n", [TextMateVimPlugin eventRouterStdin]);
+  fflush([TextMateVimPlugin eventRouterStdin]);
+
+  char response[1024];
+  if (fgets(response, 1024, [TextMateVimPlugin eventRouterStdout]) == NULL) {
+    NSLog(@"%Unable to read response from event_handler.rb!");
+    return nil;
+  } else {
+    return [[NSString stringWithUTF8String: response] JSONValue];
+  }
+}
+
 @end

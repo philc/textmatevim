@@ -57,7 +57,7 @@ static NSNumber * columnNumber;
   if (self != currentWindow)
     [self setFocusedWindow:self];
 
-  NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+  NSDictionary * messageBody = [NSDictionary dictionaryWithObjectsAndKeys:
       event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
       lineNumber, @"line",
@@ -65,18 +65,14 @@ static NSNumber * columnNumber;
       [NSNumber numberWithBool: [self.oakTextView hasSelection]], @"hasSelection",
       [NSNumber numberWithFloat: [self getScrollPosition: self.oakTextView].y], @"scrollY",
       nil];
-  fputs([[dict JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
-  fputs("\n", [TextMateVimPlugin eventRouterStdin]);
-  fflush([TextMateVimPlugin eventRouterStdin]);
-
-  char response[1024];
-  if (fgets(response, 1024, [TextMateVimPlugin eventRouterStdout]) == NULL) {
-    NSLog(@"%Unable to read response from event_handler.rb!");
+  NSObject * result = [TextMateVimPlugin sendEventRouterMessage: messageBody];
+  if (!result) {
     [super sendEvent: event];
     return;
   }
 
-  NSArray * commands = [[NSString stringWithUTF8String: response] JSONValue];
+  NSArray * commands = result;
+
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
       @"enterMode:", @"addNewline", @"copySelection", @"noOp", @"paste",
       @"scrollTo:", @"setSelection:column:", @"undo",
