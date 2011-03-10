@@ -49,4 +49,20 @@ def kill_process(name)
 end
 
 # We open this file in textmate to play around with the editing features of our plugin.
-SAMPLE_FILE = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n" + "My baloney has a first name, it's HOMER\n" * 20
+SAMPLE_FILE = <<-EOF
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n
+
+  # Executes a single command and returns the response which should be sent to textmate.
+  def execute_command(command)
+    self.key_queue = []
+    result = self.send(command.to_sym)
+    # When executing commands which modify the document, keep track of the original cursor position
+    # so we can    restore it when we unwind these commands via undo.
+    if MUTATING_COMMANDS.include?(command)
+      previous_command_stack.push(
+          { :command => command, :line => @event["line"], :column => @event["column"]})
+      previous_command_stack.shift if previous_command_stack.size > UNDO_STACK_SIZE
+    end
+    result
+  end
+EOF
