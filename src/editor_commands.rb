@@ -1,5 +1,5 @@
 module EditorCommands
-  
+
   def enter_command_mode
     self.current_mode = :command
     log "hasselection?"
@@ -59,7 +59,7 @@ module EditorCommands
 
   def select_to_beginning_of_document() ["moveToBeginningOfDocumentAndModifySelection:"] end
   def select_to_end_of_document() ["moveToEndOfDocumentAndModifySelection:"] end
-  
+
   #
   # Insertion
   #
@@ -76,7 +76,11 @@ module EditorCommands
   # Cutting
   #
   def cut_backward() ["moveBackwardAndModifySelection:", "copySelection", "deleteBackward:"] end
-  def cut_forward() ["moveForwardAndModifySelection:", "copySelection", "deleteForward:"] end
+  def cut_forward()
+    @event["hasSelection"] ?
+        ["copySelection", "deleteBackward:", "moveForward:"] :
+        ["moveForwardAndModifySelection:", "copySelection", "deleteForward:"]
+  end
 
   # Which end of the selection we're modifying first matters. After hitting undo, we want
   # the cursor to end up where it was prior to this command.

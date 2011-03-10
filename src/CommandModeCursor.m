@@ -48,6 +48,7 @@
   id oakTextView = [self superview];
 
   // Don't bother rendering our cursor when there's a selection being rendered.
+  // TODO(philc): Why not? Vim does.
   if ([oakTextView hasSelection])
     return;
 
