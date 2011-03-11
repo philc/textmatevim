@@ -32,7 +32,7 @@ mode(:command) do
   map "b", "move_word_backward"
   map "w", "move_word_forward"
   map "e", "move_to_end_of_word"
-  
+
   map "0", "move_to_beginning_of_line"
   map "$", "move_to_end_of_line"
 
@@ -63,6 +63,9 @@ mode(:command) do
   # Tabs
   map "J", "next_tab"
   map "K", "previous_tab"
+
+  # Other
+  map "<C-r>", "reload_textmatevim"
 end
 
 mode(:visual) do

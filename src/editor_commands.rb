@@ -164,4 +164,17 @@ module EditorCommands
   # Restores the cursor position to whatever it was when this command began executing. Useful for the copy
   # commands, which modify the cursor position to build a selection to copy.
   def restore_cursor_position() set_cursor_position(@event["line"], @event["column"]) end
+
+  # This is used for development. This will reload the Ruby parts of textmatevim in-process, without having
+  # to restart Textmate itself. This allows you to iteratively tweak how commands work.
+  def reload_textmatevim
+    src_path = ENV["TEXTMATEVIM_SRC_PATH"]
+    unless src_path
+      log "TEXTMATEVIM_SRC_PATH not found. Define it."
+      return []
+    end
+    load(File.join(src_path, "editor_commands.rb"))
+    load(File.join(src_path, "event_handler.rb"))
+    return no_op_command
+  end
 end

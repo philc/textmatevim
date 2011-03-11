@@ -33,7 +33,10 @@ task :launch do
   `rm -Rf '#{symlink_target}'` if File.exists?(symlink_target)
   `ln -fs #{output_path} '#{symlink_target}'`
   File.open("/tmp/sample_file", "w") { |file| file.write(SAMPLE_FILE) }
-  `#{DEV_TEXTMATE} /tmp/sample_file`
+  # Setting the TEXTMATEVIM_SRC_PATH is needed during development so that you can easily quickly load
+  # the ruby portion of the plugin while Textmate remains running.
+  project_src_path = File.join(File.dirname(__FILE__), "src")
+  `TEXTMATEVIM_SRC_PATH="#{project_src_path}" #{DEV_TEXTMATE} /tmp/sample_file`
 end
 
 task :release_bundle do
