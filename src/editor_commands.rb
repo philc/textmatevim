@@ -137,10 +137,28 @@ module EditorCommands
   #
   # Other
   #
-  def paste_before() ["paste", "moveForward:"] end
+
+  # Note: the cursor position after pasting a full line is not quite correct. It's supposed to be set to the
+  # first non-whitespace character of the newly pasted text. We're using moveWordForward after the pace to set
+  # the cursor position there, but Textmate will skip some characters (like braces) when using moveWordForward
+  def paste_before()
+    clipboard = send_message(:getClipboardContents => [])["clipboardContents"]
+    if clipboard[-1].chr == "\n"
+      ["moveToBeginningOfLine:", "paste"] + restore_cursor_position + ["moveToBeginningOfLine:"] +
+          ["moveWordForward:"]
+    else
+      ["paste", "moveForward:"]
+    end
+  end
 
   def paste_after()
-    (@event["hasSelection"] ? [] : ["moveForward:"]) + ["paste", "moveForward:"]
+    clipboard = send_message(:getClipboardContents => [])["clipboardContents"]
+    if clipboard[-1].chr == "\n"
+      ["moveDown:", "moveToBeginningOfLine:", "paste"] + restore_cursor_position + ["moveDown:"] +
+          ["moveToBeginningOfLine:"] + ["moveWordForward:"]
+    else
+      (@event["hasSelection"] ? [] : ["moveForward:"]) + ["paste", "moveForward:"]
+    end
   end
 
   def undo()
