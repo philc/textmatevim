@@ -19,7 +19,7 @@ module EditorCommands
   end
 
   def select_none
-    @event["hasSelection"] ? ["moveBackward:"] : no_op_command()
+    @event["hasSelection"] ? ["moveBackward:"] : []
   end
 
   # Movement
@@ -173,6 +173,6 @@ module EditorCommands
     end
     load(File.join(src_path, "editor_commands.rb"))
     load(File.join(src_path, "event_handler.rb"))
-    return no_op_command
+    []
   end
 end
