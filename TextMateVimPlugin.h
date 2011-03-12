@@ -10,5 +10,5 @@
 + (FILE *)eventRouterStdin;
 + (FILE *)eventRouterStdout;
 + (int)startEventRouter;
-+ (NSObject *)sendEventRouterMessage:(NSDictionary *)messageBody;
++ (NSDictionary *)sendEventRouterMessage:(NSDictionary *)messageBody;
 @end

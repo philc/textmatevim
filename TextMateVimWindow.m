@@ -24,9 +24,9 @@ static NSNumber * columnNumber;
 - (void)setFocusedWindow:(NSWindow *)theWindow {
   if (!firstTimeInitialization) {
     firstTimeInitialization = true;
-    NSArray * keybindings = (NSArray *)[TextMateVimPlugin sendEventRouterMessage:
+    NSDictionary * response = [TextMateVimPlugin sendEventRouterMessage:
         [NSDictionary dictionaryWithObjectsAndKeys: @"getKeybindings", @"message", nil]];
-    [self removeMenuItemShortcutsWhichMatch: keybindings];
+    [self removeMenuItemShortcutsWhichMatch: [response objectForKey: @"keybindings"]];
   }
 
   if (currentWindow != nil) {
@@ -49,6 +49,11 @@ static NSNumber * columnNumber;
   [self.oakTextView bind:@"columnNumber" toObject:self withKeyPath:@"columnNumber" options:nil];
 }
 
+/*
+ * Override NSWindow's default event handling and add in our own logic.
+ * We're going to pass the keystroke event out to the Ruby event handling coprocess, which will determine
+ * what to do with it according to the user's VIM mappings.
+ */
 - (void)sendEvent:(NSEvent *)event {
   if (![TextMateVimWindow isValidWindowType:self] || [event type] != NSKeyDown) {
     [super sendEvent:event];
@@ -59,7 +64,7 @@ static NSNumber * columnNumber;
   if (self != currentWindow)
     [self setFocusedWindow:self];
 
-  NSDictionary * messageBody = [NSDictionary dictionaryWithObjectsAndKeys:
+  NSDictionary * keydownMessageBody = [NSDictionary dictionaryWithObjectsAndKeys:
       @"keydown", @"message",
       event.charactersIgnoringModifiers, @"characters",
       [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
@@ -68,64 +73,66 @@ static NSNumber * columnNumber;
       [NSNumber numberWithBool: [self.oakTextView hasSelection]], @"hasSelection",
       [NSNumber numberWithFloat: [self getScrollPosition: self.oakTextView].y], @"scrollY",
       nil];
-  NSObject * result = [TextMateVimPlugin sendEventRouterMessage: messageBody];
-  if (!result) {
-    [super sendEvent: event];
-    return;
+      
+  NSDictionary * response = [TextMateVimPlugin sendEventRouterMessage: keydownMessageBody];
+
+  // Now that we've sent our keydown message to the Ruby event handler, it will send back a series of
+  // editor commands to execute, one at a time. When it's done it will indicate that we should suppress or
+  // pass through the current keystroke.
+  while (true) {
+    // "response" is of the form { "commandName" => [positional arguments] }
+    NSString * command = [[response allKeys] objectAtIndex:0];
+    if ([command isEqualToString: @"suppressKeystroke"]) {
+      return;
+    } else if ([command isEqualToString: @"passThroughKeystroke"]) {
+      [super sendEvent: event];
+      return;
+    } else {
+      response = [TextMateVimPlugin sendEventRouterMessage: [self handleMessage: response]];
+    }
   }
+}
 
-  NSArray * commands = (NSArray *)result;
-
+/*
+ * Handles a message from the Ruby event router. These include methods to forward on to the OakTextView,
+ * or methods we'll call directly on this NSWindow.
+ * - message: of the form { "commandName" => [positional arguments] }
+ */
+- (NSDictionary *)handleMessage:(NSDictionary *) message {
+  NSString * command = [[message allKeys] objectAtIndex:0];
+  NSArray * arguments = [message objectForKey:command];
+  
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"copySelection", @"noOp", @"paste",
+      @"enterMode:", @"addNewline", @"copySelection", @"paste",
       @"scrollTo:", @"setSelection:column:", @"undo",
       @"nextTab", @"previousTab", nil];
 
-  if (commands.count > 0) {
-
-    for (int i = 0; i < commands.count; i++) {
-      NSString * command = nil;
-      NSArray * arguments = nil;
-      NSObject * commandStructure = [commands objectAtIndex:i];
-
-      if ([commandStructure isKindOfClass:[NSDictionary class]]) {
-        // If this command is a hash, it's on the form { "commandName" => [arguments] }.
-        command = [[commandStructure allKeys] objectAtIndex:0];
-        arguments = [commandStructure objectForKey:command];
-      } else {
-        command = (NSString *) commandStructure;
+  if ([nonTextViewCommands containsObject:command]) {
+    // NSInvocation is necessary to handle calling methods with an arbitrary number of arguments.
+    NSMethodSignature * methodSignature =
+        [[self class] instanceMethodSignatureForSelector:NSSelectorFromString(command)];
+    NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+    [invocation setTarget:self];
+    [invocation setSelector:NSSelectorFromString(command)];
+    if (arguments) {
+      for (int i = 0; i < arguments.count; i++) { 
+        NSObject * arg = [arguments objectAtIndex:i];
+        [invocation setArgument:&arg atIndex:i + 2];
       }
-      
-      if ([nonTextViewCommands containsObject:command]) {
-        // NSInvocation is necessary to handle calling methods with an arbitrary number of arguments.
-        NSMethodSignature * methodSignature =
-            [[self class] instanceMethodSignatureForSelector:NSSelectorFromString(command)];
-        NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
-        [invocation setTarget:self];
-        [invocation setSelector:NSSelectorFromString(command)];
-        if (arguments) {
-          for (int i = 0; i < arguments.count; i++) { 
-            NSObject * arg = [arguments objectAtIndex:i];
-            [invocation setArgument:&arg atIndex:i + 2];
-          }
-        }
-
-        [invocation invoke];
-      }
-      else
-        // Pass the command on to Textmate's OakTextView.
-        [self.oakTextView performSelector: NSSelectorFromString(command) withObject: self];
     }
-  } else {
-    [super sendEvent: event];
+
+    [invocation invoke];
   }
+  else
+    // Pass the command on to Textmate's OakTextView.
+    [self.oakTextView performSelector: NSSelectorFromString(command) withObject: self];
+  
+  return [NSDictionary dictionaryWithObjectsAndKeys: nil];
 }
 
 /*
  * These are commands that the Ruby event handler can invoke.
  */
-- (void)noOp { }
-
 - (void)paste {
   // readSelectionFromPasteboard will replace whatever's currently selected.
   [self.oakTextView readSelectionFromPasteboard:[NSPasteboard generalPasteboard]];

@@ -29,21 +29,6 @@ class EventHandler
     self.previous_command_stack = []
   end
 
-  # Executes a single command and returns the response which should be sent to textmate.
-  def execute_command(command)
-    raise "Unrecognized command: #{command}" unless self.respond_to?(command.to_sym)
-    self.key_queue = []
-    result = self.send(command.to_sym)
-    # When executing commands which modify the document, keep track of the original cursor position
-    # so we can restore it when we unwind these commands via undo.
-    if MUTATING_COMMANDS.include?(command)
-      previous_command_stack.push(
-          { :command => command, :line => @event["line"], :column => @event["column"]})
-      previous_command_stack.shift if previous_command_stack.size > UNDO_STACK_SIZE
-    end
-    result
-  end
-
   # Handles a message from the Textmate process.
   # - message: a JSON string, where message["message"] indiciates the type of message.
   def handle_message(message)
@@ -65,26 +50,22 @@ class EventHandler
     key_queue.shift if key_queue.size > KEY_QUEUE_LIMIT
 
     commands = commands_for_key_queue()
-    if commands.size > 0
-      commands.map { |command| execute_command(command) }.flatten
+    if !commands.empty?
+      message_commands = commands.map { |command| execute_command(command) }.flatten
+      message_commands.each do |message_command|
+        if message_command.is_a?(Hash)
+          send_message(message_command)
+        else
+          send_message(message_command => [])
+        end
+      end
+      send_message({ :suppressKeystroke => [] }, false)
     elsif key_queue_contains_partial_command?
-      no_op_command()
+      send_message({ :suppressKeystroke => [] }, false)
     else
-      # This key is not bound to any command. If it's insert mode, pass it through.
+      # This key is not bound to any command. For insert mode, pass it through. In other modes, suppress it.
       should_pass_through = (self.current_mode == :insert || keystroke.modifiers.include?("M"))
-      should_pass_through ? [] : no_op_command
-    end
-  end
-
-  # Returns all keybindings for all modes that the user has mapped, in the form of:
-  # [[key, modifier_flags], ...] where modifier_flags is an int. These bindings will be used by TextMateVim
-  # to disable any Textmate menu items which conflict with the user's mapped keystrokes.
-  def handle_get_keybindings_message
-    keystroke_strings = KeyMap.user_keymap.map { |mode, bindings| bindings.keys }.flatten.uniq.sort
-    keystrokes = keystroke_strings.map { |string| KeyMap.keystrokes_from_string(string) }.flatten.uniq
-    keystrokes.map do |keystroke|
-      [keystroke.modifiers.include?("S") ? keystroke.key.upcase : keystroke.key,
-       keystroke.modifier_flags(false)]
+      send_message({ (should_pass_through ? :passThroughKeystroke : :suppressKeystroke) => [] }, false)
     end
   end
 
@@ -97,6 +78,22 @@ class EventHandler
       return commands unless commands.empty?
     end
     []
+  end
+
+  # Executes a single command and returns the response which should be sent to textmate. The cursor's
+  # original position is saved when executing mutating commands, so we can restore it if the user undos.
+  def execute_command(command)
+    raise "Unrecognized command: #{command}" unless self.respond_to?(command.to_sym)
+    self.key_queue = []
+    result = self.send(command.to_sym)
+    # When executing commands which modify the document, keep track of the original cursor position
+    # so we can restore it when we unwind these commands via undo.
+    if MUTATING_COMMANDS.include?(command)
+      previous_command_stack.push(
+          { :command => command, :line => @event["line"], :column => @event["column"]})
+      previous_command_stack.shift if previous_command_stack.size > UNDO_STACK_SIZE
+    end
+    result
   end
 
   # Whether any part of the current queue of keys constitutes the beginning (prefix) of a longer user command.
@@ -115,10 +112,18 @@ class EventHandler
     KeyMap.user_keymap[mode].keys.find { |command| command.index(keystroke_string) == 0 } != nil
   end
 
-  #
-  # Command methods
-  # These methods are all possible methods you can map to when defining keybindings.
-  #
+  # Returns all keybindings for all modes that the user has mapped, in the form of:
+  # [[key, modifier_flags], ...] where modifier_flags is an int. These bindings will be used by Textmatevim
+  # to disable any Textmate menu items which conflict with the user's mapped keystrokes.
+  def handle_get_keybindings_message
+    keystroke_strings = KeyMap.user_keymap.map { |mode, bindings| bindings.keys }.flatten.uniq.sort
+    keystrokes = keystroke_strings.map { |string| KeyMap.keystrokes_from_string(string) }.flatten.uniq
+    keybindings = keystrokes.map do |keystroke|
+      [keystroke.modifiers.include?("S") ? keystroke.key.upcase : keystroke.key,
+       keystroke.modifier_flags(false)]
+    end
+    send_message({ :keybindings => keybindings }, false)
+  end
 end
 
 # Loads the user's config file and shows a warning alert message if the file has trouble loading due to
@@ -139,7 +144,18 @@ def log(str)
 end
 
 def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
-  
+
+# Send message sends a message and waits for a response.
+def send_message(message, wait_for_response = true)
+  debug_log("sending message: #{message}")
+  puts message.to_json
+  STDOUT.flush
+  return nil unless wait_for_response
+  response = STDIN.gets
+  debug_log("received response: #{response}")
+  JSON.parse(response)
+end
+
 if $0 == __FILE__
   log "TextMateVim event_handler.rb coprocess is online."
 
@@ -149,14 +165,13 @@ if $0 == __FILE__
   while message = STDIN.gets
     response = []
     begin
-      response = event_handler.handle_message(message)
+      debug_log "received message: #{message}"
+      messages = event_handler.handle_message(message)
       debug_log "response: #{response.inspect}"
     rescue => error
       log error.to_s
       log error.backtrace.join("\n")
       response = []
     end
-    puts response.to_json
-    STDOUT.flush
   end
 end

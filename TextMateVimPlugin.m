@@ -62,10 +62,9 @@ static FILE * eventRouterStdout;
 }
 
 /*
- * Sends a message to the Ruby event router process. The result will be deserialized from JSON; it can
- * be an NSArray, NSDictionary, or nil.
+ * Sends a message to the Ruby event router process. The result will be a dictionary deserialized from JSON.
  */
-+ (NSObject *)sendEventRouterMessage:(NSDictionary *)messageBody {
++ (NSDictionary *)sendEventRouterMessage:(NSDictionary *)messageBody {
   fputs([[messageBody JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
   fputs("\n", [TextMateVimPlugin eventRouterStdin]);
   fflush([TextMateVimPlugin eventRouterStdin]);

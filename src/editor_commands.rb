@@ -149,8 +149,6 @@ module EditorCommands
     ["undo"] + (saved_state ? set_cursor_position(saved_state[:line], saved_state[:column]) : [])
   end
 
-  def no_op_command() ["noOp"] end
-
   def set_cursor_position(line, column)
     # On the Textmate text view, we have access to a function which lets us set the position of the boundary
     # of one end of the current selection. To collapse that selection, we need to know which end the cursor
