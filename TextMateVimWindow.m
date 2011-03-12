@@ -103,10 +103,11 @@ static NSNumber * columnNumber;
   NSArray * arguments = [message objectForKey:command];
   
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"copySelection", @"paste",
+      @"enterMode:", @"addNewline", @"copySelection", @"paste", @"getClipboardContents",
       @"scrollTo:", @"setSelection:column:", @"undo",
       @"nextTab", @"previousTab", nil];
 
+  NSDictionary * result = NULL;
   if ([nonTextViewCommands containsObject:command]) {
     // NSInvocation is necessary to handle calling methods with an arbitrary number of arguments.
     NSMethodSignature * methodSignature =
@@ -122,17 +123,24 @@ static NSNumber * columnNumber;
     }
 
     [invocation invoke];
+    if ([[invocation methodSignature] methodReturnLength] > 0)
+      [invocation getReturnValue:&result];
   }
   else
     // Pass the command on to Textmate's OakTextView.
     [self.oakTextView performSelector: NSSelectorFromString(command) withObject: self];
-  
-  return [NSDictionary dictionaryWithObjectsAndKeys: nil];
+
+  return (result == NULL) ? [NSDictionary dictionaryWithObjectsAndKeys: nil] : result;
+/*  return [NSDictionary dictionaryWithObjectsAndKeys: nil];*/
 }
 
 /*
  * These are commands that the Ruby event handler can invoke.
  */
+- (NSDictionary *)getClipboardContents {
+  NSString * clipboardContents = [[NSPasteboard generalPasteboard] stringForType:@"NSStringPboardType"];
+  return [NSDictionary dictionaryWithObjectsAndKeys: clipboardContents, @"clipboardContents", nil];
+}
 - (void)paste {
   // readSelectionFromPasteboard will replace whatever's currently selected.
   [self.oakTextView readSelectionFromPasteboard:[NSPasteboard generalPasteboard]];
