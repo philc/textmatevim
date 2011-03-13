@@ -80,7 +80,7 @@ class EventHandler
   def commands_for_key_queue
     (0).upto(self.key_queue.size - 1) do |i|
       key_sequence = self.key_queue[i..-1].map(&:to_s).join
-      number_prefix = key_sequence.scan(/^\d+/)[0]
+      number_prefix = key_sequence.scan(/^[1-9][0-9]*/)[0] # 0 can be used in normal mappings.
       key_sequence = key_sequence[number_prefix.size..-1] if number_prefix
       commands = Array(KeyMap.user_keymap[self.current_mode][key_sequence])
       return [(number_prefix || 1).to_i, commands] unless commands.empty?
