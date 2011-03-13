@@ -4,8 +4,8 @@ TextMateVim is composed of two parts. The first is a TextMate plugin written in 
 
 The rationale for this is that the Ruby side is far easier to change debug.
 
-Building
-========
+Building & Hacking
+==================
 To build the plugin, from the root of the project directory, run
 
     rake build
@@ -25,6 +25,12 @@ Now you can run two TextMates side-by-side, each with their own different bundle
 To both build and load TextMateVim plugin into your Developer TextMate, run
 
     rake launch
+
+Tests
+=====
+For any large refactorings or non-trivial changes, leverage the unit tests. You can run them like this.
+
+    rake test
 
 References
 ==========
