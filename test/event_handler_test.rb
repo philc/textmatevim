@@ -53,32 +53,32 @@ class EventHandlerTest < Test::Unit::TestCase
       type_key "v"
       assert_equal :visual, @event_handler.current_mode
     end
-  
+
     context "passing through keystrokes" do
       should "not let unbound keys pass through in command mode" do
         @event_handler.current_mode = :command
         stub_keymap(:command => {})
         assert_equal ["suppressKeystroke"], type_key("v")
       end
-  
+
       should "let unbound keys with the CMD modifier pass through in command mode" do
         @event_handler.current_mode = :command
         stub_keymap(:command => {})
         assert_equal ["passThroughKeystroke"], type_key("<M-c>")
       end
-  
+
       should "let unbound keys pass through in insert mode" do
         @event_handler.current_mode = :insert
         stub_keymap(:insert => {})
         assert_equal ["passThroughKeystroke"], type_key("v")
       end
     end
-  
+
     should "execute multiple commands if more than one is specified as the target of a user's key mapping" do
       stub_keymap(:command => { "q" => ["move_forward", "move_backward"] })
       assert_equal ["moveForward:", "moveBackward:", "suppressKeystroke"], type_key("q")
     end
-  
+
     should "queue up keystrokes and execute commands composed of multiple keystrokes" do
       stub_keymap(:command => { "gg" => "move_to_beginning_of_document" })
       # The first key should result in a noOp, because it might turn out to be part of the "gg" command.
@@ -87,7 +87,7 @@ class EventHandlerTest < Test::Unit::TestCase
       assert_equal [], @event_handler.key_queue
     end
   end
-  
+
   context "get_keybindings" do
     should "return a list of all registered keybindings across all modes" do
       stub_keymap(:command => { "<C-y>" => "first command" }, :insert => { "Q" => "second command" })
@@ -95,12 +95,12 @@ class EventHandlerTest < Test::Unit::TestCase
       assert_equal [["y", KeyStroke::ControlKeyMask], ["Q", 0]], @messages.first[:keybindings]
     end
   end
-  
+
   context "keymap" do
     should "parse out multiple keystrokes from a string" do
       assert_equal "x<C-M-y>Z", KeyMap.keystrokes_from_string("x<M-C-y>Z").map(&:to_s).join
     end
-  
+
     should "parse out < as a special keystroke" do
       assert_equal "<lt>", KeyMap.keystrokes_from_string("<lt>").map(&:to_s).join
     end
