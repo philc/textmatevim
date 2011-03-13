@@ -61,8 +61,8 @@ mode(:command) do
   map "yb", "copy_word_backward"
 
   # Tabs
-  map "J", "next_tab"
-  map "K", "previous_tab"
+  map "J", "previous_tab"
+  map "K", "next_tab"
 
   # Other
   map "<C-r>", "reload_textmatevim"
