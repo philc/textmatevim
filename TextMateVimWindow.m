@@ -100,7 +100,8 @@ static NSNumber * columnNumber;
   NSArray * arguments = [message objectForKey:command];
   
   NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"copySelection", @"paste", @"getClipboardContents",
+      @"enterMode:", @"addNewline", @"copySelection", @"paste",
+      @"getClipboardContents", @"setClipboardContents:",
       @"scrollTo:", @"setSelection:column:", @"undo",
       @"nextTab", @"previousTab", nil];
 
@@ -137,6 +138,10 @@ static NSNumber * columnNumber;
 - (NSDictionary *)getClipboardContents {
   NSString * clipboardContents = [[NSPasteboard generalPasteboard] stringForType:@"NSStringPboardType"];
   return [NSDictionary dictionaryWithObjectsAndKeys: clipboardContents, @"clipboardContents", nil];
+}
+
+- (void)setClipboardContents:(NSString *)contents {
+  [[NSPasteboard generalPasteboard] setString:contents forType:@"NSStringPboardType"];
 }
 - (void)paste {
   // readSelectionFromPasteboard will replace whatever's currently selected.

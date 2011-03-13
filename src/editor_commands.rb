@@ -124,8 +124,19 @@ module EditorCommands
   end
 
   def copy_line()
-    ["moveToBeginningOfLine:", "moveToEndOfLineAndModifySelection:", "copySelection"] +
-        restore_cursor_position()
+    # Note that we want to capture the newline at the end of the line, so when we paste this, it's treated
+    # as a line-paste.
+    ["moveToBeginningOfLine:", "moveToEndOfLineAndModifySelection:", "copySelection"].each do |command|
+      send_message(command => [])
+    end
+
+    # Note that we have to add a newline onto the end of the selection because if we paste this selection,
+    # we want the paste to be treated like a line paste.
+    clipboard = send_message("getClipboardContents" => [])["clipboardContents"]
+    clipboard += "\n"
+    send_message("setClipboardContents:" => [clipboard])
+
+    restore_cursor_position()
   end
 
   #
@@ -142,7 +153,7 @@ module EditorCommands
   # first non-whitespace character of the newly pasted text. We're using moveWordForward after the pace to set
   # the cursor position there, but Textmate will skip some characters (like braces) when using moveWordForward
   def paste_before()
-    clipboard = send_message(:getClipboardContents => [])["clipboardContents"]
+    clipboard = send_message("getClipboardContents" => [])["clipboardContents"]
     if clipboard[-1].chr == "\n"
       ["moveToBeginningOfLine:", "paste"] + restore_cursor_position + ["moveToBeginningOfLine:"] +
           ["moveWordForward:"]
