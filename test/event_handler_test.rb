@@ -86,6 +86,14 @@ class EventHandlerTest < Test::Unit::TestCase
       assert_equal ["moveToBeginningOfDocument:", "suppressKeystroke"], type_key("g")
       assert_equal [], @event_handler.key_queue
     end
+
+    should "execute a command twice if 2 is prefixed before the command" do
+      stub_keymap(:command => { "x" => "cut_forward" })
+      type_key("2")
+      expected = ["moveForwardAndModifySelection:"] * 2 + ["copySelection", "deleteForward:",
+          "suppressKeystroke"]
+      assert_equal(expected, type_key("x"))
+    end
   end
 
   context "get_keybindings" do

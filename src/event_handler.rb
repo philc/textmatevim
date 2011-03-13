@@ -13,8 +13,9 @@ class EventHandler
   include EditorCommands
 
   attr_accessor :current_mode, :key_queue, :previous_command_stack
-  # TODO(philc): This limit should be based on the longest of the user's mapped commands.
-  KEY_QUEUE_LIMIT = 3
+  # TODO(philc): This limit should be based on the longest of the user's mapped commands plus room for number
+  # prefixes.
+  KEY_QUEUE_LIMIT = 5
 
   # This is how many mutating commands we keep track of, for the purposes of restoring the original cursor
   # position when these commands get unwound via "undo".
@@ -49,8 +50,10 @@ class EventHandler
     key_queue.push(keystroke.to_s)
     key_queue.shift if key_queue.size > KEY_QUEUE_LIMIT
 
-    commands = commands_for_key_queue()
-    if !commands.empty?
+    @number_prefix, commands = commands_for_key_queue()
+    # Just in case someone accidentally types 999 before a command, don't rip apart their document.
+    @number_prefix = 50 if (@number_prefix && @number_prefix > 50)
+    if commands && !commands.empty?
       message_commands = commands.map { |command| execute_command(command) }.flatten
       message_commands.each do |message_command|
         if message_command.is_a?(Hash)
@@ -61,6 +64,8 @@ class EventHandler
       end
       send_message({ :suppressKeystroke => [] }, false)
     elsif key_queue_contains_partial_command?
+      # Note that the queue can contain partial commands evnet in insert mode, so we may be suppressing
+      # keystrokes in insert mode. This doesn't account for number prefixes, by design.
       send_message({ :suppressKeystroke => [] }, false)
     else
       # This key is not bound to any command. For insert mode, pass it through. In other modes, suppress it.
@@ -69,15 +74,18 @@ class EventHandler
     end
   end
 
-  # Returns the user specified command matching the current queue of keys. Multiple commands can be specified
-  # as the target of a keybinding (e.g. "h" => ["move_forward", "cut_forward"])
+  # Returns the number prefix (or 1, if there was none) typed prior to any commands (e.g. "2" in "2j"), and
+  # the list of user specified commands matching the current queue of keys. Note that multiple commands can
+  # be specified as the target of a keybinding, e.g. "h" => ["move_forward", "cut_forward"].
   def commands_for_key_queue
     (0).upto(self.key_queue.size - 1) do |i|
-      key_sequence = self.key_queue[i..-1]
-      commands = Array(KeyMap.user_keymap[self.current_mode][key_sequence.map(&:to_s).join])
-      return commands unless commands.empty?
+      key_sequence = self.key_queue[i..-1].map(&:to_s).join
+      number_prefix = key_sequence.scan(/^\d+/)[0]
+      key_sequence = key_sequence[number_prefix.size..-1] if number_prefix
+      commands = Array(KeyMap.user_keymap[self.current_mode][key_sequence])
+      return [(number_prefix || 1).to_i, commands] unless commands.empty?
     end
-    []
+    [0, []]
   end
 
   # Executes a single command and returns the response which should be sent to textmate. The cursor's

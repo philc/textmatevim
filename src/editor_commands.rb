@@ -77,9 +77,11 @@ module EditorCommands
   #
   def cut_backward() ["moveBackwardAndModifySelection:", "copySelection", "deleteBackward:"] end
   def cut_forward()
-    @event["hasSelection"] ?
-        ["copySelection", "deleteBackward:", "moveForward:"] :
-        ["moveForwardAndModifySelection:", "copySelection", "deleteForward:"]
+    if @event["hasSelection"]
+      ["copySelection", "deleteBackward:", "moveForward:"]
+    else
+      ["moveForwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteForward:"]
+    end
   end
 
   # Which end of the selection we're modifying first matters. After hitting undo, we want
