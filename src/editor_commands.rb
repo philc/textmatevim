@@ -156,7 +156,7 @@ module EditorCommands
     clipboard = send_message("getClipboardContents" => [])["clipboardContents"]
     if clipboard[-1].chr == "\n"
       ["moveToBeginningOfLine:", "paste"] + restore_cursor_position + ["moveToBeginningOfLine:"] +
-          ["moveWordForward:"]
+          (is_whitespace?(clipboard[0].chr) ? ["moveWordForward:"] : [])
     else
       ["paste", "moveForward:"]
     end
@@ -166,7 +166,7 @@ module EditorCommands
     clipboard = send_message(:getClipboardContents => [])["clipboardContents"]
     if clipboard[-1].chr == "\n"
       ["moveDown:", "moveToBeginningOfLine:", "paste"] + restore_cursor_position + ["moveDown:"] +
-          ["moveToBeginningOfLine:"] + ["moveWordForward:"]
+          ["moveToBeginningOfLine:"] + (is_whitespace?(clipboard[0].chr) ? ["moveWordForward:"] : [])
     else
       (@event["hasSelection"] ? [] : ["moveForward:"]) + ["paste", "moveForward:"]
     end
@@ -204,4 +204,6 @@ module EditorCommands
     load(File.join(src_path, "event_handler.rb"))
     []
   end
+
+  def is_whitespace?(character) character =~ /\s/ end
 end
