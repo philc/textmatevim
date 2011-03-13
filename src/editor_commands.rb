@@ -201,14 +201,15 @@ module EditorCommands
     # On the Textmate text view, we have access to a function which lets us set the position of the boundary
     # of one end of the current selection. To collapse that selection, we need to know which end the cursor
     # is on. As a brute force approach, set the selection to the beginning of the document and then move left.
-    # Doing so can change the window's vertical scroll position, so we'll restore that.
+    # This is sure to collapse the selection completely. Doing so can change the window's vertical scroll
+    # position, so we must restore that scroll position.
     [{ "setSelection:column:" => [0, 0] }, "moveBackward:",
      { "setSelection:column:" => [line + 1, column + 1] }, "moveForward:",
      { "scrollTo:" => [@event["scrollY"]] }]
   end
 
   # Restores the cursor position to whatever it was when this command began executing. Useful for the copy
-  # commands, which modify the cursor position to build a selection to copy.
+  # commands, which heavily modify the cursor position when building up a selection to copy.
   def restore_cursor_position() set_cursor_position(@event["line"], @event["column"]) end
 
   # This is used for development. This will reload the Ruby parts of textmatevim in-process, without having
