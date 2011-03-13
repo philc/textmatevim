@@ -23,17 +23,18 @@ module EditorCommands
   end
 
   # Movement
-  def move_backward() ["moveBackward:"] end
-  def move_forward() ["moveForward:"] end
-  def move_down() ["moveDown:"] end
-  def move_up() ["moveUp:"] end
+  def move_backward() ["moveBackward:"] * @number_prefix end
+  def move_forward() ["moveForward:"] * @number_prefix end
+  def move_down() ["moveDown:"] * @number_prefix end
+  def move_up() ["moveUp:"] * @number_prefix end
 
-  def half_page_down() ["moveDown:"] * 6 end
-  def half_page_up() ["moveUp:"] * 6 end
+  # NOTE(philc): "half page" is currently approximated by 6 lines up and down.
+  def half_page_down() ["moveDown:"] * 6 * @number_prefix end
+  def half_page_up() ["moveUp:"] * 6 * @number_prefix end
 
-  def move_word_backward() ["moveWordBackward:"] end
-  def move_word_forward() ["moveWordForward:"] end
-  def move_to_end_of_word() ["moveToEndOfWord:"] end
+  def move_word_backward() ["moveWordBackward:"] * @number_prefix end
+  def move_word_forward() ["moveWordForward:"] * @number_prefix end
+  def move_to_end_of_word() ["moveToEndOfWord:"] * @number_prefix end
 
   def move_to_beginning_of_line() ["moveToBeginningOfLine:"] end
   def move_to_end_of_line() ["moveToEndOfLine:"] end
@@ -42,17 +43,17 @@ module EditorCommands
   def move_to_end_of_document() ["moveToEndOfDocument:"] end
 
   # Movement + selection
-  def select_backward() ["moveBackwardAndModifySelection:"] end
-  def select_forward() ["moveForwardAndModifySelection:"] end
-  def select_down() ["moveDownAndModifySelection:"] end
-  def select_up() ["moveUpAndModifySelection:"] end
+  def select_backward() ["moveBackwardAndModifySelection:"] * @number_prefix end
+  def select_forward() ["moveForwardAndModifySelection:"] * @number_prefix end
+  def select_down() ["moveDownAndModifySelection:"] * @number_prefix end
+  def select_up() ["moveUpAndModifySelection:"] * @number_prefix end
 
-  def select_half_page_down() ["moveDownAndModifySelection:"] * 6 end
-  def select_half_page_up() ["moveUpAndModifySelection:"] * 6 end
+  def select_half_page_down() ["moveDownAndModifySelection:"] * 6 * @number_prefix end
+  def select_half_page_up() ["moveUpAndModifySelection:"] * 6 * @number_prefix end
 
-  def select_word_backward() ["moveWordBackwardAndModifySelection:"] end
-  def select_word_forward() ["moveWordForwardAndModifySelection:"] end
-  def select_to_end_of_word() ["moveToEndOfWordAndModifySelection:"] end
+  def select_word_backward() ["moveWordBackwardAndModifySelection:"] * @number_prefix end
+  def select_word_forward() ["moveWordForwardAndModifySelection:"] * @number_prefix end
+  def select_to_end_of_word() ["moveToEndOfWordAndModifySelection:"] * @number_prefix end
 
   def select_to_beginning_of_line() ["moveToBeginningOfLineAndModifySelection:"] end
   def select_to_end_of_line() ["moveToEndOfLineAndModifySelection:"] end
@@ -75,7 +76,10 @@ module EditorCommands
   #
   # Cutting
   #
-  def cut_backward() ["moveBackwardAndModifySelection:", "copySelection", "deleteBackward:"] end
+  def cut_backward()
+    ["moveBackwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteBackward:"]
+  end
+
   def cut_forward()
     if @event["hasSelection"]
       ["copySelection", "deleteBackward:", "moveForward:"]
@@ -87,12 +91,12 @@ module EditorCommands
   # Which end of the selection we're modifying first matters. After hitting undo, we want
   # the cursor to end up where it was prior to this command.
   def cut_word_forward()
-    ["moveWordForward:", "moveWordBackwardAndModifySelection:", "copySelection",
-     "deleteForward:"]
+    ["moveWordForwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteForward:"] +
+        restore_cursor_position()
   end
 
   def cut_word_backward()
-    ["moveWordBackwardAndModifySelection:", "copySelection", "deleteBackward:"]
+    ["moveWordBackwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteBackward:"]
   end
 
   def cut_line()
@@ -115,28 +119,34 @@ module EditorCommands
 
   # VIM will move your cursor to the left when you execute this copy.
   def copy_backward()
-    ["moveBackwardAndModifySelection:", "copySelection", "moveForward:", "moveBackward:"]
+    ["moveBackwardAndModifySelection:"] * @number_prefix + ["copySelection", "moveForward:", "moveBackward:"]
   end
 
-  def copy_word_forward() ["moveWordForwardAndModifySelection:", "copySelection"] + restore_cursor_position() end
+  def copy_word_forward()
+    ["moveWordForwardAndModifySelection:"] * @number_prefix + ["copySelection"] + restore_cursor_position()
+  end
 
   # VIM will move your cursor to the left when you execute this copy.
   def copy_word_backward()
-    ["moveWordBackwardAndModifySelection:", "copySelection"] + restore_cursor_position + ["moveWordBackward:"]
+    ["moveWordBackwardAndModifySelection:"] * @number_prefix + ["copySelection"] + restore_cursor_position() +
+        ["moveWordBackward:"]
   end
 
   def copy_line()
     # Note that we want to capture the newline at the end of the line, so when we paste this, it's treated
     # as a line-paste.
-    ["moveToBeginningOfLine:", "moveToEndOfLineAndModifySelection:", "copySelection"].each do |command|
-      send_message(command => [])
-    end
+    commands = ["moveToBeginningOfLine:"] + ["moveDownAndModifySelection:"] * @number_prefix +
+        ["copySelection"]
+    commands.each { |command| send_message(command => []) }
 
     # Note that we have to add a newline onto the end of the selection because if we paste this selection,
-    # we want the paste to be treated like a line paste.
+    # we want the paste to be treated like a line paste. The copied selection may not have a newline if
+    # we've copied the last line of the file.
     clipboard = send_message("getClipboardContents" => [])["clipboardContents"]
-    clipboard += "\n"
-    send_message("setClipboardContents:" => [clipboard])
+    if (clipboard[-1].chr != "\n")
+      clipboard += "\n"
+      send_message("setClipboardContents:" => [clipboard])
+    end
 
     restore_cursor_position()
   end
@@ -144,14 +154,19 @@ module EditorCommands
   #
   # Tabs
   #
-  def next_tab() ["nextTab"] end
-  def previous_tab() ["previousTab"] end
+  def next_tab() ["nextTab"] * @number_prefix end
+  def previous_tab() ["previousTab"] * @number_prefix end
 
   #
   # Other
   #
 
-  # Note: the cursor position after pasting a full line is not quite correct. It's supposed to be set to the
+  # About pasting:
+  #
+  # When the clipboard being pasted ends with a newline, treat it as a "line paste". In Vim that means the
+  # clipboard will be pasted on its own line instead of in the middle of the line you're currently on.
+  #
+  # The cursor position after pasting a full line is not quite correct. It's supposed to be set to the
   # first non-whitespace character of the newly pasted text. We're using moveWordForward after the pace to set
   # the cursor position there, but Textmate will skip some characters (like braces) when using moveWordForward
   def paste_before()
@@ -176,8 +191,10 @@ module EditorCommands
 
   def undo()
     # If we're undoing a previous command which mutated the document, restore the user's cursor position.
-    saved_state = previous_command_stack.pop
-    ["undo"] + (saved_state ? set_cursor_position(saved_state[:line], saved_state[:column]) : [])
+    saved_state = nil
+    @number_prefix.times { saved_state = previous_command_stack.pop }
+    ["undo"] * @number_prefix +
+        (saved_state ? set_cursor_position(saved_state[:line], saved_state[:column]) : [])
   end
 
   def set_cursor_position(line, column)
