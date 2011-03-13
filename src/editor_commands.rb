@@ -91,7 +91,7 @@ module EditorCommands
   # Which end of the selection we're modifying first matters. After hitting undo, we want
   # the cursor to end up where it was prior to this command.
   def cut_word_forward()
-    ["moveWordForwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteForward:"] +
+    select_word_forward_including_whitespace() * @number_prefix + ["copySelection", "deleteBackward:"] +
         restore_cursor_position()
   end
 
@@ -211,6 +211,14 @@ module EditorCommands
   # Restores the cursor position to whatever it was when this command began executing. Useful for the copy
   # commands, which heavily modify the cursor position when building up a selection to copy.
   def restore_cursor_position() set_cursor_position(@event["line"], @event["column"]) end
+
+  def select_word_forward_including_whitespace()
+    # Textmate does some smart selecting of whitespace depending on which direction you're moving
+    # between words. Leverage that behavior to select whitespace characters following a word in addition
+    # to that word. NOTE(philc): This should be made more robust. It doesn't handle runs of whitespace
+    # nor whitespace around arithmetic operators.
+    ["moveWordForwardAndModifySelection:"] * 2 + ["moveWordBackwardAndModifySelection:"]
+  end
 
   # This is used for development. This will reload the Ruby parts of textmatevim in-process, without having
   # to restart Textmate itself. This allows you to iteratively tweak how commands work.
