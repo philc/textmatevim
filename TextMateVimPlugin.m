@@ -1,6 +1,6 @@
 #import "TextMateVimPlugin.h"
 #import "TextMateVimWindow.h"
-#import <JSON/JSON.h>
+#import "JSON.h"
 
 @implementation TextMateVimPlugin
 

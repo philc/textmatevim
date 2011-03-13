@@ -1,6 +1,3 @@
-/*
- * We're using this JSON framework: http://stig.github.com/json-framework/
- */
 #import "TextMateVimWindow.h"
 #import "TextMateVimPlugin.h"
 #import "CommandModeCursor.h"

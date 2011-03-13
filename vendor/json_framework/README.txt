@@ -1,0 +1,1 @@
+This JSON implementation is from http://stig.github.com/json-framework/.
