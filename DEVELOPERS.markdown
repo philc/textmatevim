@@ -32,6 +32,13 @@ For any large refactorings or non-trivial changes, leverage the unit tests. You 
 
     rake test
 
+Coding style
+============
+In brief:
+
+ * Follow the style in the file you're editing.
+ * Ensure your lines don't exceed 110 characters.
+
 References
 ==========
 After browsing through the source code, you'll see that most of the modal editing commands are implemented in editor_commands.rb. Most of the commands that we send to TextMate are methods on Cocoa's NSResponder class. Browsing the Apple documentation for what NSResponder can do will tell you what's possible.
