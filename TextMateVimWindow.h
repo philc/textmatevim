@@ -5,7 +5,7 @@
 }
 
 - (void)addNewline;
-+ (BOOL)isValidWindowType:(NSWindow *)theWindow;
++ (BOOL)isEditorWindow:(NSWindow *)theWindow;
 - (void)sendEvent:(NSEvent *)theEvent;
 - (void)enterMode:(NSString *)mode;
 - (NSPoint)getScrollPosition:(NSView *)view;
@@ -15,5 +15,6 @@
 - (void)removeMenuItemShortcutsWhichMatch:(NSArray *)keybindings;
 - (void)nextTab;
 - (void)previousTab;
+- (NSDictionary *)handleMessage:(NSDictionary *)message;
 
 @end

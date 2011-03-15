@@ -5,13 +5,18 @@
 @implementation TextMateVimWindow
 
 static BOOL firstTimeInitialization = false;
+
 static TextMateVimWindow * currentWindow;
+// The view which draws the vim-style block cursor.
 static CommandModeCursor * cursorView;
 static NSString * currentMode;
 static NSNumber * lineNumber;
 static NSNumber * columnNumber;
 
-+ (BOOL)isValidWindowType:(NSWindow *)window {
+/*
+ * We only want to intercept events for windows which contain the text editing view.
+ */
++ (BOOL)isEditorWindow:(NSWindow *)window {
   return [[window firstResponder] isKindOfClass:NSClassFromString(@"OakTextView")];
 }
 
@@ -49,10 +54,10 @@ static NSNumber * columnNumber;
 /*
  * Override NSWindow's default event handling and add in our own logic.
  * We're going to pass the keystroke event out to the Ruby event handling coprocess, which will determine
- * what to do with it according to the user's VIM mappings.
+ * what to do with it according to the user's modal keymappings.
  */
 - (void)sendEvent:(NSEvent *)event {
-  if (![TextMateVimWindow isValidWindowType:self] || [event type] != NSKeyDown) {
+  if (![TextMateVimWindow isEditorWindow:self] || event.type != NSKeyDown) {
     [super sendEvent:event];
     return;
   }
@@ -64,11 +69,11 @@ static NSNumber * columnNumber;
   NSDictionary * keydownMessageBody = [NSDictionary dictionaryWithObjectsAndKeys:
       @"keydown", @"message",
       event.charactersIgnoringModifiers, @"characters",
-      [NSNumber numberWithInt: event.modifierFlags], @"modifierFlags",
+      [NSNumber numberWithInt:event.modifierFlags], @"modifierFlags",
       lineNumber, @"line",
       columnNumber, @"column",
-      [NSNumber numberWithBool: [self.oakTextView hasSelection]], @"hasSelection",
-      [NSNumber numberWithFloat: [self getScrollPosition: self.oakTextView].y], @"scrollY",
+      [NSNumber numberWithBool:[self.oakTextView hasSelection]], @"hasSelection",
+      [NSNumber numberWithFloat:[self getScrollPosition:self.oakTextView].y], @"scrollY",
       nil];
       
   NSDictionary * response = [TextMateVimPlugin sendEventRouterMessage: keydownMessageBody];
@@ -95,18 +100,18 @@ static NSNumber * columnNumber;
  * or methods we'll call directly on this NSWindow.
  * - message: of the form { "commandName" => [positional arguments] }
  */
-- (NSDictionary *)handleMessage:(NSDictionary *) message {
+- (NSDictionary *)handleMessage:(NSDictionary *)message {
   NSString * command = [[message allKeys] objectAtIndex:0];
   NSArray * arguments = [message objectForKey:command];
   
-  NSArray * nonTextViewCommands = [NSArray arrayWithObjects:
+  NSArray * textMateVimWindowCommands = [NSArray arrayWithObjects:
       @"enterMode:", @"addNewline", @"copySelection", @"paste",
       @"getClipboardContents", @"setClipboardContents:",
       @"scrollTo:", @"setSelection:column:", @"undo",
       @"nextTab", @"previousTab", nil];
 
   NSDictionary * result = NULL;
-  if ([nonTextViewCommands containsObject:command]) {
+  if ([textMateVimWindowCommands containsObject:command]) {
     // NSInvocation is necessary to handle calling methods with an arbitrary number of arguments.
     NSMethodSignature * methodSignature =
         [[self class] instanceMethodSignatureForSelector:NSSelectorFromString(command)];
@@ -125,11 +130,10 @@ static NSNumber * columnNumber;
       [invocation getReturnValue:&result];
   }
   else
-    // Pass the command on to Textmate's OakTextView.
-    [self.oakTextView performSelector: NSSelectorFromString(command) withObject: self];
+    // Pass the command on to TextMate's OakTextView.
+    [self.oakTextView performSelector: NSSelectorFromString(command) withObject:self];
 
-  return (result == NULL) ? [NSDictionary dictionaryWithObjectsAndKeys: nil] : result;
-/*  return [NSDictionary dictionaryWithObjectsAndKeys: nil];*/
+  return (result == NULL) ? [NSDictionary dictionaryWithObjectsAndKeys:nil] : result;
 }
 
 /*
@@ -137,12 +141,13 @@ static NSNumber * columnNumber;
  */
 - (NSDictionary *)getClipboardContents {
   NSString * clipboardContents = [[NSPasteboard generalPasteboard] stringForType:@"NSStringPboardType"];
-  return [NSDictionary dictionaryWithObjectsAndKeys: clipboardContents, @"clipboardContents", nil];
+  return [NSDictionary dictionaryWithObjectsAndKeys:clipboardContents, @"clipboardContents", nil];
 }
 
 - (void)setClipboardContents:(NSString *)contents {
   [[NSPasteboard generalPasteboard] setString:contents forType:@"NSStringPboardType"];
 }
+
 - (void)paste {
   // readSelectionFromPasteboard will replace whatever's currently selected.
   [self.oakTextView readSelectionFromPasteboard:[NSPasteboard generalPasteboard]];
@@ -154,21 +159,21 @@ static NSNumber * columnNumber;
 
 /* Scrolls the OakTextView to the given Y coordinate. TODO(philc): Support X as well. */
 - (void)scrollTo:(NSNumber *)y {
-  NSPoint scrollPosition = [self getScrollPosition: (NSView *)self.oakTextView];
+  NSPoint scrollPosition = [self getScrollPosition:(NSView *)self.oakTextView];
   scrollPosition.y = y.floatValue;
-  [self.oakTextView scrollPoint: scrollPosition];
+  [self.oakTextView scrollPoint:scrollPosition];
 }
 
 - (void)addNewline { [self.oakTextView insertText:@"\n"]; }
 
-/* NOTE(philc): I'm not sure what this argument is supposed to be to undo, but using 0 causes the last
- * action to be undone, which is precisely what we need. */
+/* NOTE(philc): I'm not sure what the argument is supposed to be to the undo method, but using 0 causes the
+ * last action to be undone, which is precisely what we need. */
 - (void)undo { [self.oakTextView undo:0]; }
 
 - (void)enterMode:(NSString *)mode {
   currentMode = mode;
   if (cursorView)
-    [cursorView setMode: mode];
+    [cursorView setMode:mode];
 }
 
 - (void)nextTab {
@@ -197,6 +202,7 @@ static NSNumber * columnNumber;
   lineNumber = theLineNumber;
   [lineNumber retain];
 }
+
 - (void)setColumnNumber:(id)theColumnNumber {
   if (columnNumber)
     [columnNumber release];
@@ -207,12 +213,16 @@ static NSNumber * columnNumber;
 /* For the given NSView, retrieves its scroll position. */
 - (NSPoint)getScrollPosition:(NSView *)view { return view.enclosingScrollView.documentVisibleRect.origin; }
 
-// OakTextView is Textmate's text editor implementation.
+/* OakTextView is TextMate's text editor implementation. */
 - (NSView *)oakTextView { return (NSView *)self.firstResponder; }
 
-// The TabBarView which controls the tabs for the current window. nil if only a single file is being edited.
+/*
+ * The TabBarView which controls the tabs for the current window. nil if only a single file is being edited.
+ */
 - (id)oakTabBarView {
   NSView * current = self.oakTextView;
+  // Walk through OakTextView's parent views until we hit "NSThemeFrame". OakTabBarView is a child of
+  // NSThemeFrame.
   while (current && current.superview &&
       ![current.superview isKindOfClass:NSClassFromString(@"NSThemeFrame")])
     current = current.superview;
