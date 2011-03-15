@@ -7,8 +7,6 @@
 @interface TextMateVimPlugin : NSObject {
 }
 - (id)initWithPlugInController:(id <TMPlugInController>)aController;
-+ (FILE *)eventRouterStdin;
-+ (FILE *)eventRouterStdout;
 + (int)startEventRouter;
 + (NSDictionary *)sendEventRouterMessage:(NSDictionary *)messageBody;
 @end

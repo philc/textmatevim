@@ -2,19 +2,21 @@
 #import "TextMateVimWindow.h"
 #import "JSON.h"
 
+/*
+ * This plugin substitutes its own class for NSWindow so that it can intercept keyboard events.
+ * It forks off a Ruby coprocess which implements all of the modal keybinding logic.
+ */
 @implementation TextMateVimPlugin
 
 int MAX_JSON_MESSAGE_SIZE = 8096;
 
-// Pipes to the event router process, written in Ruby.
+// Pipes to the Ruby event router process.
 static FILE * eventRouterStdin;
 static FILE * eventRouterStdout;
 
-- (id)initWithPlugInController:(id <TMPlugInController>)controller
-{
-  NSLog( @"TextMateVim has arrived." );
+- (id)initWithPlugInController:(id <TMPlugInController>)controller {
   int pid = [TextMateVimPlugin startEventRouter];
-  NSLog(@"Ruby process ID: %i", pid);
+  NSLog(@"TextMateVim has arrived. The ruby coprocess ID: %i", pid);
 
   // "poseAsClass" has been deprecated, but it still works. Use performSelector to avoid compiler
   // warnings and errors.
@@ -22,12 +24,11 @@ static FILE * eventRouterStdout;
   return [super init];
 }
 
-+ (FILE *)eventRouterStdin { return eventRouterStdin; }
-
-+ (FILE *)eventRouterStdout { return eventRouterStdout; }
-
+/*
+ * Spawns an event router coprocess.
+ */
 + (int)startEventRouter {
-  // Reference for this bidirectional pipe.
+  // Refer to this post on setting up bidrectional pipes.
   // http://www.cocoabuilder.com/archive/cocoa/1018-bi-directional-pipes-follow-up.html
   NSLog(@"startEventRouter");
   int readPipe[2], writePipe[2];
@@ -56,7 +57,6 @@ static FILE * eventRouterStdout;
       close(writePipe[0]);
       eventRouterStdout = fdopen(readPipe[0], "r");
       eventRouterStdin = fdopen(writePipe[1], "w");
-      NSLog(@"%@", @"Pipes assigned");
   }
   return pid;
 }
@@ -65,12 +65,12 @@ static FILE * eventRouterStdout;
  * Sends a message to the Ruby event router process. The result will be a dictionary deserialized from JSON.
  */
 + (NSDictionary *)sendEventRouterMessage:(NSDictionary *)messageBody {
-  fputs([[messageBody JSONRepresentation] UTF8String], [TextMateVimPlugin eventRouterStdin]);
-  fputs("\n", [TextMateVimPlugin eventRouterStdin]);
-  fflush([TextMateVimPlugin eventRouterStdin]);
+  fputs([[messageBody JSONRepresentation] UTF8String], eventRouterStdin);
+  fputs("\n", eventRouterStdin);
+  fflush(eventRouterStdin);
 
   char response[MAX_JSON_MESSAGE_SIZE];
-  if (fgets(response, MAX_JSON_MESSAGE_SIZE, [TextMateVimPlugin eventRouterStdout]) == NULL) {
+  if (fgets(response, MAX_JSON_MESSAGE_SIZE, eventRouterStdout) == NULL) {
     NSLog(@"%Unable to read response from event_handler.rb!");
     return nil;
   } else {
