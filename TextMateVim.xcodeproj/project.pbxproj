@@ -16,6 +16,8 @@
 		0A77BEB3111FFA4D006F0625 /* RubyCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */; };
 		6A3CD22913308F74001A7161 /* TextMateVimPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A3CD22613308F74001A7161 /* TextMateVimPlugin.m */; };
 		6A3CD22A13308F74001A7161 /* TextMateVimWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A3CD22813308F74001A7161 /* TextMateVimWindow.m */; };
+		6A3CD2361330A6EA001A7161 /* json_implementation.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A3CD2351330A6EA001A7161 /* json_implementation.rb */; };
+		6A3CD23C13315554001A7161 /* activesupport_json.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A3CD23B13315554001A7161 /* activesupport_json.rb */; };
 		6A709FCA13245B320064415D /* ui_helper.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A709FC913245B320064415D /* ui_helper.rb */; };
 		6A8618E81324CDD7001A5360 /* editor_commands.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A8618E71324CDD7001A5360 /* editor_commands.rb */; };
 		6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33E9131250B80029DE19 /* CommandModeCursor.m */; };
@@ -48,6 +50,8 @@
 		6A3CD22613308F74001A7161 /* TextMateVimPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TextMateVimPlugin.m; path = src/TextMateVimPlugin.m; sourceTree = "<group>"; };
 		6A3CD22713308F74001A7161 /* TextMateVimWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextMateVimWindow.h; path = src/TextMateVimWindow.h; sourceTree = "<group>"; };
 		6A3CD22813308F74001A7161 /* TextMateVimWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TextMateVimWindow.m; path = src/TextMateVimWindow.m; sourceTree = "<group>"; };
+		6A3CD2351330A6EA001A7161 /* json_implementation.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = json_implementation.rb; sourceTree = "<group>"; };
+		6A3CD23B13315554001A7161 /* activesupport_json.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = activesupport_json.rb; path = lib/activesupport_json.rb; sourceTree = SOURCE_ROOT; };
 		6A709FC913245B320064415D /* ui_helper.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = ui_helper.rb; sourceTree = "<group>"; };
 		6A8618E71324CDD7001A5360 /* editor_commands.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = editor_commands.rb; sourceTree = "<group>"; };
 		6ABA33E8131250B80029DE19 /* CommandModeCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandModeCursor.h; path = src/CommandModeCursor.h; sourceTree = "<group>"; };
@@ -161,6 +165,8 @@
 		6ABE41051313B263001CA6B4 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6A3CD23B13315554001A7161 /* activesupport_json.rb */,
+				6A3CD2351330A6EA001A7161 /* json_implementation.rb */,
 				6A8618E71324CDD7001A5360 /* editor_commands.rb */,
 				6A709FC913245B320064415D /* ui_helper.rb */,
 				6ABE41081313B263001CA6B4 /* default_config.rb */,
@@ -228,6 +234,8 @@
 				6ABE41101313B263001CA6B4 /* keystroke.rb in Resources */,
 				6A709FCA13245B320064415D /* ui_helper.rb in Resources */,
 				6A8618E81324CDD7001A5360 /* editor_commands.rb in Resources */,
+				6A3CD2361330A6EA001A7161 /* json_implementation.rb in Resources */,
+				6A3CD23C13315554001A7161 /* activesupport_json.rb in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

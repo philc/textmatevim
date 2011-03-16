@@ -6,27 +6,17 @@
 # This is spawned by the TextMateVim objective-C plugin, which opens pipes to this process to communicate
 # with it.
 
-def log(str)
-  file = File.open("/tmp/textmatevim.log", "a") { |file| file.puts(str) }
-end
+ENABLE_DEBUG_LOGGING = false
 
-# More verbose logging used during development.
-def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
+$LOAD_PATH.push(File.dirname(__FILE__) + "/")
+$LOAD_PATH.push(File.dirname(__FILE__) + "/lib/")
 
 require "rubygems"
-begin
-  require "json"
-  $LOAD_PATH.push(File.dirname(__FILE__) + "/")
-  require "keystroke"
-  require "keymap"
-  require "ui_helper"
-  require "editor_commands"
-rescue => error
-  log("Unable to start TextMateVim's event_handler.rb: #{error}")
-  exit 1
-end
-
-ENABLE_DEBUG_LOGGING = false
+require "keystroke"
+require "keymap"
+require "ui_helper"
+require "editor_commands"
+require "json_implementation"
 
 class EventHandler
   include EditorCommands
@@ -158,7 +148,7 @@ class EventHandler
       [keystroke.modifiers.include?("S") ? keystroke.key.upcase : keystroke.key,
        keystroke.modifier_flags(false)]
     end
-    send_message({ :keybindings => keybindings }, false)
+    send_message({ :keybindings => keybindings.uniq }, false)
   end
 end
 
@@ -178,7 +168,7 @@ end
 # Sends a message and waits for a response.
 # - message: a hash representing the message. This will be converted to JSON.
 def send_message(message, wait_for_response = true)
-  debug_log("sending message: #{message}")
+  debug_log("sending message: #{message.to_json}")
   puts message.to_json
   STDOUT.flush
   return nil unless wait_for_response
@@ -186,6 +176,13 @@ def send_message(message, wait_for_response = true)
   debug_log("received response: #{response}")
   JSON.parse(response)
 end
+
+def log(str)
+  file = File.open("/tmp/textmatevim.log", "a") { |file| file.puts(str) }
+end
+
+# Use for more verbose logging during development.
+def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
 
 if $0 == __FILE__
   log "TextMateVim event_handler.rb coprocess has been started."
@@ -197,7 +194,6 @@ if $0 == __FILE__
     begin
       debug_log "received message: #{message}"
       messages = event_handler.handle_message(message)
-      debug_log "response: #{response.inspect}"
     rescue => error
       log error.to_s
       log error.backtrace.join("\n")
