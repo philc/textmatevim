@@ -7,15 +7,13 @@ $configuration = ENV['Configuration'] || 'Debug'
 task :default => :test
 task :run => :build
 
+desc "Builds the plugin. Configuration (Debug or Release) can be set in the Configuration env variable"
 task :build do
   # Textmate is currently built against i386, and so must our plugin be.
   sh "xcodebuild -configuration #{$configuration} ARCHS='i386'"
 end
 
-task :run do
-  exec "build/Debug/textmatevim.app/Contents/MacOS/textmatevim"
-end
-
+desc "Run the tests"
 task :test do |task|
   Dir.glob("test/*_test.rb").each do |filename|
     sh "ruby #{filename}"
@@ -23,8 +21,8 @@ task :test do |task|
 end
 
 desc "Launches a development version of textmate, with TextMateVim active"
-task :launch => :build
-task :launch do
+task :debug => :build
+task :debug do
   kill_process(DEV_TEXTMATE)
   output_path = File.expand_path("build/Debug/#{APPNAME}.bundle")
 
@@ -39,6 +37,7 @@ task :launch do
   `TEXTMATEVIM_SRC_PATH="#{project_src_path}" #{DEV_TEXTMATE} /tmp/sample_file`
 end
 
+desc "Produces a release bundle in build/release"
 task :release_bundle do
   $configuration = "Release"
   Rake::Task["build"].invoke
@@ -51,7 +50,8 @@ def kill_process(name)
   sh "kill -9 #{pid}" if pid
 end
 
-# We open this file in textmate to play around with the editing features of our plugin.
+# We open this file in TextMate to play around with the editing features of our plugin when running our
+# plugin via "rake debug".
 SAMPLE_FILE = <<-EOF
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n
 

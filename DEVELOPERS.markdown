@@ -24,7 +24,7 @@ Now you can run two TextMates side-by-side, each with their own different bundle
 
 To both build and load TextMateVim plugin into your Developer TextMate, run
 
-    rake launch
+    rake debug
 
 Tests
 =====
