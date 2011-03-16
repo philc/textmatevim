@@ -6,14 +6,25 @@
 # This is spawned by the TextMateVim objective-C plugin, which opens pipes to this process to communicate
 # with it.
 
+def log(str)
+  file = File.open("/tmp/textmatevim.log", "a") { |file| file.puts(str) }
+end
+
+# More verbose logging used during development.
+def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
+
 require "rubygems"
-# TODO(philc): Vendor this gem.
-require "json"
-$LOAD_PATH.push(File.dirname(__FILE__) + "/")
-require "keystroke"
-require "keymap"
-require "ui_helper"
-require "editor_commands"
+begin
+  require "json"
+  $LOAD_PATH.push(File.dirname(__FILE__) + "/")
+  require "keystroke"
+  require "keymap"
+  require "ui_helper"
+  require "editor_commands"
+rescue => error
+  log("Unable to start TextMateVim's event_handler.rb: #{error}")
+  exit 1
+end
 
 ENABLE_DEBUG_LOGGING = false
 
@@ -163,13 +174,6 @@ def load_user_config_file
         "There was a problem loading your ~/.textmatevimrc:\n\n" + error.to_s)
   end
 end
-
-def log(str)
-  file = File.open("/tmp/textmatevim.log", "a") { |file| file.puts(str) }
-end
-
-# More verbose logging used during development.
-def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
 
 # Sends a message and waits for a response.
 # - message: a hash representing the message. This will be converted to JSON.
