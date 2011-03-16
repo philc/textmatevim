@@ -1,5 +1,5 @@
-# This is a config file which uses the same format that user config files use. It defines the default key
-# mappings.
+# This is a Ruby config file which uses the same format that user config files use. It defines the default key
+# mappings. Mappings in the user's config file (located in ~/.textmatevimrc) can override these.
 
 require "keymap"
 include KeyMap

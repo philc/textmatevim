@@ -1,6 +1,7 @@
-# This is the  configuration DSL that users include into their config files to define key mappings.
+# This is the configuration DSL that users include into their config files to define key mappings.
 #
-# Key mappings can be defined using map() and mode():
+# Key mappings can be defined using map() and mode().
+#
 #   map "j", "moveLeft"
 #   map "g,g", "scrollToTop"
 #   map("z,z") { arbitrary ruby code }
@@ -8,12 +9,15 @@
 #   mode(:insert) do
 #     map "esc", "exitInsertMode"
 #   end
+#
+# Any keybinding not inside of a mode block is assumed to be defining a key mapping for command mode:
 
 require "keystroke"
 module KeyMap
   USER_KEYMAP = {}
-  @current_mode = nil
 
+  # Sets the mode that the nested keystrokes should be defined for.
+  # - modes: one or more modes, like [:command, :visual].
   def mode(*modes, &block)
     @current_modes = modes.map { |mode| mode.to_sym }
     block.call
@@ -28,7 +32,7 @@ module KeyMap
       char = keystroke_string[0].chr
       if (char == "<" && keystroke_string.size > 1)
         i = keystroke_string.index(">")
-        raise "Invalid key mapping" unless i
+        raise "Invalid key mapping syntax" unless i
         keystrokes.push(KeyStroke.from_string(keystroke_string[0..i]))
         keystroke_string = keystroke_string[(i + 1)..-1] || ""
       else
@@ -50,7 +54,5 @@ module KeyMap
     end
   end
 
-  def self.user_keymap
-    KeyMap::USER_KEYMAP
-  end
+  def self.user_keymap() KeyMap::USER_KEYMAP end
 end

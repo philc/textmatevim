@@ -1,5 +1,13 @@
 #!/usr/bin/env ruby
+#
+# This event handler receives messages over stdin with the user's keydown events, and it determines which
+# actions to take in the editor based on the user's key mappings. It sends messages over stdout.
+#
+# This is spawned by the TextMateVim objective-C plugin, which opens pipes to this process to communicate
+# with it.
+
 require "rubygems"
+# TODO(philc): Vendor this gem.
 require "json"
 $LOAD_PATH.push(File.dirname(__FILE__) + "/")
 require "keystroke"
@@ -12,14 +20,19 @@ ENABLE_DEBUG_LOGGING = false
 class EventHandler
   include EditorCommands
 
-  attr_accessor :current_mode, :key_queue, :previous_command_stack
-  # TODO(philc): This limit should be based on the longest of the user's mapped commands plus room for number
-  # prefixes.
+  attr_accessor :current_mode
+  # The list of keys which have been typed. We check this each keystroke to see a full command has been typed.
+  attr_accessor :key_queue
+  # We keep track of previous commands so that we can unwind them with our undo implementation.
+  attr_accessor :previous_command_stack
+
+  # TODO(philc): This limit should really be based on the longest of the user's mapped commands plus room
+  # for number prefixes.
   KEY_QUEUE_LIMIT = 5
 
   # This is how many mutating commands we keep track of, for the purposes of restoring the original cursor
-  # position when these commands get unwound via "undo".
-  UNDO_STACK_SIZE = 3
+  # position when these commands get unwound via our implementation of undo.
+  UNDO_STACK_SIZE = 5
 
   MUTATING_COMMANDS = %W(cut_backward cut_forward cut_word_forward cut_word_backward cut_line
        cut_to_beginning_of_line cut_to_end_of_line paste_before paste_after)
@@ -30,7 +43,7 @@ class EventHandler
     self.previous_command_stack = []
   end
 
-  # Handles a message from the Textmate process.
+  # Handles a message from the TextMate process.
   # - message: a JSON string, where message["message"] indiciates the type of message.
   def handle_message(message)
     message_json = JSON.parse(message)
@@ -40,10 +53,10 @@ class EventHandler
     end
   end
 
-  # Interprets the keystroke event in light of the current mode.
-  # Returns a list of commands that TextMateVim should perform. The ["no_op"] command instructs TextMateVim
-  # to ignore the current keystroke. An empty list means to pass-through the keystroke.
+  # Interprets the user's keystroke event in light of the current mode. This sends a list of commands to
+  # TextMate, finally ending with either a "suppressKeystroke" or a "passThroughKeystroke" command.
   def handle_keydown_message(message)
+    # @event is used by some commands in editor_commands.rb.
     @event = message
     keystroke = KeyStroke.from_character_and_modifier_flags(@event["characters"], @event["modifierFlags"])
 
@@ -51,21 +64,24 @@ class EventHandler
     key_queue.shift if key_queue.size > KEY_QUEUE_LIMIT
 
     @number_prefix, commands = commands_for_key_queue()
-    # Just in case someone accidentally types 999 before a command, don't rip apart their document.
-    @number_prefix = 50 if (@number_prefix && @number_prefix > 50)
+    # Cap the number of commands we'll execute in case someone accidentally types "999x".
+    @number_prefix = [50, @number_prefix].min if @number_prefix
     if commands && !commands.empty?
-      message_commands = commands.map { |command| execute_command(command) }.flatten
-      message_commands.each do |message_command|
-        if message_command.is_a?(Hash)
-          send_message(message_command)
+      # Each of our command methods should return an array of methods for TextMateVim to invoke on the
+      # TextMate text editor.
+      messages = commands.map { |command| execute_command(command) }.flatten
+      messages.each do |message|
+        # Commands can either be a String (a method name) or a Hash (method name => [arguments])
+        if message.is_a?(Hash)
+          send_message(message)
         else
-          send_message(message_command => [])
+          send_message(message => [])
         end
       end
       send_message({ :suppressKeystroke => [] }, false)
     elsif key_queue_contains_partial_command?
-      # Note that the queue can contain partial commands evnet in insert mode, so we may be suppressing
-      # keystrokes in insert mode. This doesn't account for number prefixes, by design.
+      # Note that the queue can contain partial commands even in insert mode, so we may be suppressing
+      # keystrokes in insert mode. This suppression logic doesn't account for number prefixes, by design.
       send_message({ :suppressKeystroke => [] }, false)
     else
       # This key is not bound to any command. For insert mode, pass it through. In other modes, suppress it.
@@ -74,9 +90,11 @@ class EventHandler
     end
   end
 
-  # Returns the number prefix (or 1, if there was none) typed prior to any commands (e.g. "2" in "2j"), and
-  # the list of user specified commands matching the current queue of keys. Note that multiple commands can
-  # be specified as the target of a keybinding, e.g. "h" => ["move_forward", "cut_forward"].
+  # The commands for the given key queue.
+  # Returns a pair containing the number prefix (or 1, if there was no number prefix) typed prior to any
+  # commands (e.g. "2" in "2j"), and the list of user specified commands matching the current queue of keys.
+  # Note that multiple commands can be specified as the target of a keybinding, e.g.
+  # "h" => ["move_forward", "cut_forward"].
   def commands_for_key_queue
     (0).upto(self.key_queue.size - 1) do |i|
       key_sequence = self.key_queue[i..-1].map(&:to_s).join
@@ -88,15 +106,14 @@ class EventHandler
     [0, []]
   end
 
-  # Executes a single command and returns the response which should be sent to textmate. The cursor's
+  # Executes a single command and returns the responses which should be sent to TextMate. The cursor's
   # original position is saved when executing mutating commands, so we can restore it if the user undos.
   def execute_command(command)
     raise "Unrecognized command: #{command}" unless self.respond_to?(command.to_sym)
     self.key_queue = []
     result = self.send(command.to_sym)
-    # When executing commands which modify the document, keep track of the original cursor position
-    # so we can restore it when we unwind these commands via undo.
     if MUTATING_COMMANDS.include?(command)
+      # Save cursor position prior to the edit, so we can restore later if the user undos.
       previous_command_stack.push(
           { :command => command, :line => @event["line"], :column => @event["column"]})
       previous_command_stack.shift if previous_command_stack.size > UNDO_STACK_SIZE
@@ -121,7 +138,7 @@ class EventHandler
   end
 
   # Returns all keybindings for all modes that the user has mapped, in the form of:
-  # [[key, modifier_flags], ...] where modifier_flags is an int. These bindings will be used by Textmatevim
+  # [[key, modifier_flags], ...] where modifier_flags is an int. These bindings will be used by TextMateVim
   # to disable any Textmate menu items which conflict with the user's mapped keystrokes.
   def handle_get_keybindings_message
     keystroke_strings = KeyMap.user_keymap.map { |mode, bindings| bindings.keys }.flatten.uniq.sort
@@ -148,12 +165,14 @@ def load_user_config_file
 end
 
 def log(str)
-  file = File.open("/tmp/event_handler.log", "a") { |file| file.puts(str) }
+  file = File.open("/tmp/textmatevim.log", "a") { |file| file.puts(str) }
 end
 
+# More verbose logging used during development.
 def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
 
-# Send message sends a message and waits for a response.
+# Sends a message and waits for a response.
+# - message: a hash representing the message. This will be converted to JSON.
 def send_message(message, wait_for_response = true)
   debug_log("sending message: #{message}")
   puts message.to_json
@@ -165,13 +184,12 @@ def send_message(message, wait_for_response = true)
 end
 
 if $0 == __FILE__
-  log "TextMateVim event_handler.rb coprocess is online."
+  log "TextMateVim event_handler.rb coprocess has been started."
 
   load "default_config.rb"
   load_user_config_file
   event_handler = EventHandler.new
   while message = STDIN.gets
-    response = []
     begin
       debug_log "received message: #{message}"
       messages = event_handler.handle_message(message)
@@ -179,7 +197,6 @@ if $0 == __FILE__
     rescue => error
       log error.to_s
       log error.backtrace.join("\n")
-      response = []
     end
   end
 end

@@ -1,10 +1,8 @@
-# Represents a keystroke consisting of a key
-# and its modifiers.
+# Represents a keystroke consisting of a key and its modifiers.
 class KeyStroke
   include Comparable
-  private
 
-  # Translation of modifier keys to their int modifier flag.
+  # Translation of modifier keys to their int modifier flag. For reference
   # http://developer.apple.com/documentation/Cocoa/Reference/ApplicationKit/Classes/
   # nsevent_Class/Reference/Reference.html#//apple_ref/occ/instm/NSEvent/modifierFlags
   AlphaShiftKeyMask = 1 << 16
@@ -26,6 +24,7 @@ class KeyStroke
     "lt" => "<",
     "gt" => ">"
   }
+
   @@key_to_readable = @@readable_to_key.invert
 
   MODIFIER_MAP = {
@@ -44,7 +43,7 @@ class KeyStroke
   attr_accessor :modifiers
   attr_accessor :key
 
-  def initialize()
+  def initialize
     @modifiers = []
   end
 
@@ -101,6 +100,7 @@ class KeyStroke
     modifier_keys.reject! { |key, value| value == false }.keys.sort
   end
 
+  # Represents this keystroke in a user-readable form like <C-X> for CTRL+SHIFT+x.
   def to_s
     key = self.key.dup
     modifiers = self.modifiers.dup
@@ -116,7 +116,5 @@ class KeyStroke
     end
   end
 
-  def <=>(other)
-    to_s <=> other.to_s
-  end
+  def <=>(other) to_s <=> other.to_s end
 end
