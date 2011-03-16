@@ -12,9 +12,10 @@
 		0A4347AA132CB1C0007C2EBF /* SBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A4347A3132CB1C0007C2EBF /* SBJsonBase.m */; };
 		0A4347AB132CB1C0007C2EBF /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A4347A5132CB1C0007C2EBF /* SBJsonParser.m */; };
 		0A4347AC132CB1C0007C2EBF /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A4347A7132CB1C0007C2EBF /* SBJsonWriter.m */; };
-		0A77BE7B111FF36C006F0625 /* TextMateVimPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A77BE7A111FF36C006F0625 /* TextMateVimPlugin.m */; };
 		0A77BE8F111FF5B2006F0625 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BE8E111FF5B2006F0625 /* Cocoa.framework */; };
 		0A77BEB3111FFA4D006F0625 /* RubyCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */; };
+		6A3CD22913308F74001A7161 /* TextMateVimPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A3CD22613308F74001A7161 /* TextMateVimPlugin.m */; };
+		6A3CD22A13308F74001A7161 /* TextMateVimWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A3CD22813308F74001A7161 /* TextMateVimWindow.m */; };
 		6A709FCA13245B320064415D /* ui_helper.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A709FC913245B320064415D /* ui_helper.rb */; };
 		6A8618E81324CDD7001A5360 /* editor_commands.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A8618E71324CDD7001A5360 /* editor_commands.rb */; };
 		6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33E9131250B80029DE19 /* CommandModeCursor.m */; };
@@ -23,7 +24,6 @@
 		6ABE410E1313B263001CA6B4 /* event_handler.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE41091313B263001CA6B4 /* event_handler.rb */; };
 		6ABE410F1313B263001CA6B4 /* keymap.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE410A1313B263001CA6B4 /* keymap.rb */; };
 		6ABE41101313B263001CA6B4 /* keystroke.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE410B1313B263001CA6B4 /* keystroke.rb */; };
-		6ADFAD3213120125009113FB /* TextMateVimWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADFAD3113120125009113FB /* TextMateVimWindow.m */; };
 		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
 		8D5B49A804867FD3000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8D5B49A704867FD3000E48DA /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
@@ -41,11 +41,13 @@
 		0A4347A5132CB1C0007C2EBF /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
 		0A4347A6132CB1C0007C2EBF /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonWriter.h; sourceTree = "<group>"; };
 		0A4347A7132CB1C0007C2EBF /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
-		0A77BE79111FF36C006F0625 /* TextMateVimPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextMateVimPlugin.h; sourceTree = "<group>"; };
-		0A77BE7A111FF36C006F0625 /* TextMateVimPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextMateVimPlugin.m; sourceTree = "<group>"; };
 		0A77BE8E111FF5B2006F0625 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RubyCocoa.framework; path = System/Library/Frameworks/RubyCocoa.framework; sourceTree = SDKROOT; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		6A3CD22513308F74001A7161 /* TextMateVimPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextMateVimPlugin.h; path = src/TextMateVimPlugin.h; sourceTree = "<group>"; };
+		6A3CD22613308F74001A7161 /* TextMateVimPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TextMateVimPlugin.m; path = src/TextMateVimPlugin.m; sourceTree = "<group>"; };
+		6A3CD22713308F74001A7161 /* TextMateVimWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextMateVimWindow.h; path = src/TextMateVimWindow.h; sourceTree = "<group>"; };
+		6A3CD22813308F74001A7161 /* TextMateVimWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TextMateVimWindow.m; path = src/TextMateVimWindow.m; sourceTree = "<group>"; };
 		6A709FC913245B320064415D /* ui_helper.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = ui_helper.rb; sourceTree = "<group>"; };
 		6A8618E71324CDD7001A5360 /* editor_commands.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = editor_commands.rb; sourceTree = "<group>"; };
 		6ABA33E8131250B80029DE19 /* CommandModeCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandModeCursor.h; path = src/CommandModeCursor.h; sourceTree = "<group>"; };
@@ -56,8 +58,6 @@
 		6ABE41091313B263001CA6B4 /* event_handler.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = event_handler.rb; sourceTree = "<group>"; };
 		6ABE410A1313B263001CA6B4 /* keymap.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = keymap.rb; sourceTree = "<group>"; };
 		6ABE410B1313B263001CA6B4 /* keystroke.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = keystroke.rb; sourceTree = "<group>"; };
-		6ADFAD3013120125009113FB /* TextMateVimWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextMateVimWindow.h; sourceTree = "<group>"; };
-		6ADFAD3113120125009113FB /* TextMateVimWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextMateVimWindow.m; sourceTree = "<group>"; };
 		8D576316048677EA00EA77CD /* TextMateVim.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TextMateVim.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -110,14 +110,14 @@
 		08FB77AFFE84173DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				6A3CD22513308F74001A7161 /* TextMateVimPlugin.h */,
+				6A3CD22613308F74001A7161 /* TextMateVimPlugin.m */,
+				6A3CD22713308F74001A7161 /* TextMateVimWindow.h */,
+				6A3CD22813308F74001A7161 /* TextMateVimWindow.m */,
 				0A43479C132CB1C0007C2EBF /* json_framework */,
 				6ABA33EB131251490029DE19 /* lib */,
 				6ABA33E8131250B80029DE19 /* CommandModeCursor.h */,
 				6ABA33E9131250B80029DE19 /* CommandModeCursor.m */,
-				6ADFAD3013120125009113FB /* TextMateVimWindow.h */,
-				6ADFAD3113120125009113FB /* TextMateVimWindow.m */,
-				0A77BE79111FF36C006F0625 /* TextMateVimPlugin.h */,
-				0A77BE7A111FF36C006F0625 /* TextMateVimPlugin.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -238,8 +238,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A77BE7B111FF36C006F0625 /* TextMateVimPlugin.m in Sources */,
-				6ADFAD3213120125009113FB /* TextMateVimWindow.m in Sources */,
 				6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */,
 				6ABA33EE131251490029DE19 /* NSColor_categories.m in Sources */,
 				0A4347A8132CB1C0007C2EBF /* NSObject+SBJSON.m in Sources */,
@@ -247,6 +245,8 @@
 				0A4347AA132CB1C0007C2EBF /* SBJsonBase.m in Sources */,
 				0A4347AB132CB1C0007C2EBF /* SBJsonParser.m in Sources */,
 				0A4347AC132CB1C0007C2EBF /* SBJsonWriter.m in Sources */,
+				6A3CD22913308F74001A7161 /* TextMateVimPlugin.m in Sources */,
+				6A3CD22A13308F74001A7161 /* TextMateVimWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
