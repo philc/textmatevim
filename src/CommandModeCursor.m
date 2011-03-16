@@ -28,7 +28,6 @@
 - (void)setMode:(NSString *)theMode {
   if ([theMode isEqualToString: mode])
     return;
-  NSLog(@"%@", @"setting mode on command mode cursor");
 
   [mode release];
   [theMode retain];
