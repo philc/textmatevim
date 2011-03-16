@@ -14,7 +14,8 @@
 
 require "keystroke"
 module KeyMap
-  USER_KEYMAP = {}
+  # When indexing into this hash with a mode, if there is no keys defined for that mode, return an empty hash.
+  USER_KEYMAP = Hash.new { |hash, mode| hash[mode] = Hash.new }
 
   # Sets the mode that the nested keystrokes should be defined for.
   # - modes: one or more modes, like [:command, :visual].
