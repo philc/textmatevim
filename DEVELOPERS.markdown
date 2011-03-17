@@ -49,6 +49,6 @@ The best way to poke around with TextMate's classes is to use the FScript Inject
 http://pmougin.wordpress.com/2010/01/05/the-revenge-of-f-script-anywhere/
 
 
-Another way to explore classes is to perform a classdump of TextMate. I've found this less useful than using the FScript explorer. Here's an overview.
+Another way to explore classes is to perform a classdump of TextMate. I've found this less useful than using the FScript explorer. Here's an overview:
 
-http://www.culater.net/wiki/moin.cgi/CocoaReverseEngineering
+[[http://www.culater.net/wiki/moin.cgi/CocoaReverseEngineering]]
