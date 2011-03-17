@@ -8,7 +8,7 @@
 # has macports installed, then the gem environment TextMateVim uses will not contain the gem they installed
 # via the terminal. If we require gems in the future, we should bundle them with TextMateVim.
 #
-# We're not bundling the JSON gem with TextMateVim because it's GPL.
+# We're not bundling the JSON gem with TextMateVim because it's GPL. Argh!
 require "yaml"
 
 #

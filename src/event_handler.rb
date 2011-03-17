@@ -17,6 +17,7 @@ require "keymap"
 require "ui_helper"
 require "editor_commands"
 require "json_implementation"
+require "google_analytics"
 
 class EventHandler
   include EditorCommands
@@ -184,9 +185,18 @@ end
 # Use for more verbose logging during development.
 def debug_log(str) log(str) if ENABLE_DEBUG_LOGGING end
 
+# We'd like to roughly know how many folks are using TextMateVim. We ping google analytics whenever TextMate
+# first starts up with this plugin installed.
+def ping_google_analytics
+  machine_unique_id = "unknown" # TODO(philc): do we need this?
+  google_analytics_id = "UA-22129017-1"
+  GoogleAnalytics::GoogleAnalytics.new(google_analytics_id, "github.com").event("AppEvents", "Launch",
+      machine_unique_id, 1)
+end
+
 if $0 == __FILE__
   log "TextMateVim event_handler.rb coprocess has been started."
-
+  ping_google_analytics()
   load "default_config.rb"
   load_user_config_file
   event_handler = EventHandler.new
