@@ -2,8 +2,6 @@ module EditorCommands
 
   def enter_command_mode
     self.current_mode = :command
-    log "hasselection?"
-    log @event["hasSelection"]
     [{ "enterMode:" => ["command"] }] + (@event["hasSelection"] ? ["moveBackward:"] : [])
   end
 
