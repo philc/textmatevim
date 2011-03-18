@@ -98,7 +98,8 @@ module EditorCommands
   end
 
   def cut_line()
-    ["moveToBeginningOfLine:", "moveDownAndModifySelection:", "copySelection", "deleteBackward:"]
+    ["moveToBeginningOfLine:"] + ["moveDownAndModifySelection:"] * @number_prefix +
+        ["copySelection", "deleteBackward:"]
   end
 
   def cut_to_beginning_of_line()
