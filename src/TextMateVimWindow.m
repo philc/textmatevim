@@ -218,6 +218,9 @@ static NSNumber * columnNumber;
 
 /*
  * The TabBarView which controls the tabs for the current window. nil if only a single file is being edited.
+ * NOTE(philc): This will break if the structure of the view hierarchy has been changed by another plugin.
+ * For instance, the TextMateMiniMap changes the view hiearchy. A more reliable appraoch may be to find the
+ * menu item for "Navigation > Next File Tab" and invoke its action directly. See NSMenuItem.
  */
 - (id)oakTabBarView {
   NSView * current = self.oakTextView;
