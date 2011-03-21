@@ -2,7 +2,7 @@ module EditorCommands
 
   def enter_command_mode
     self.current_mode = :command
-    [{ "enterMode:" => ["command"] }] + (@event["hasSelection"] ? ["moveBackward:"] : [])
+    [{ "enterMode:" => ["command"] }, "selectNone"]
   end
 
   def enter_insert_mode
@@ -75,12 +75,16 @@ module EditorCommands
   # Cutting
   #
   def cut_backward()
-    ["moveBackwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteBackward:"]
+    if @event["hasSelection"]
+      ["copySelection", "deleteBackward:", "moveForward:"]
+    else
+      ["moveBackwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteBackward:"]
+    end
   end
 
   def cut_forward()
     if @event["hasSelection"]
-      ["copySelection", "deleteBackward:", "moveForward:"]
+      ["copySelection", "deleteBackward:"]
     else
       ["moveForwardAndModifySelection:"] * @number_prefix + ["copySelection", "deleteForward:"]
     end

@@ -16,5 +16,6 @@
 - (void)nextTab;
 - (void)previousTab;
 - (NSDictionary *)handleMessage:(NSDictionary *)message;
+- (NSDictionary *)hasSelection;
 
 @end

@@ -105,7 +105,7 @@ static NSNumber * columnNumber;
   NSArray * arguments = [message objectForKey:command];
   
   NSArray * textMateVimWindowCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"copySelection", @"paste",
+      @"enterMode:", @"addNewline", @"copySelection", @"paste", @"hasSelection", @"selectNone",
       @"getClipboardContents", @"setClipboardContents:",
       @"scrollTo:", @"setSelection:column:", @"undo",
       @"nextTab", @"previousTab", nil];
@@ -191,6 +191,21 @@ static NSNumber * columnNumber;
 - (void)copySelection {
   [self.oakTextView writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
       types:[NSArray arrayWithObject:@"NSStringPboardType"]];
+}
+
+- (NSDictionary *)hasSelection {
+  NSNumber * hasSelection = [NSNumber numberWithBool:[self.oakTextView hasSelection]];
+  return [NSDictionary dictionaryWithObjectsAndKeys: hasSelection, @"hasSelection", nil];
+}
+
+/*
+ * Deselects any current selection. This is implemented on the objective C side because we don't want to
+ * move the cursor unless there is a selection, and that can only be known after executing all of the commands
+ * sent by the Ruby event handler.
+ */
+- (void)selectNone {
+  if ([self.oakTextView hasSelection])
+    [self.oakTextView performSelector: NSSelectorFromString(@"moveBackward:") withObject:self];
 }
 
 - (NSNumber *)lineNumber { return lineNumber; }
