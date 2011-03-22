@@ -8,13 +8,13 @@ If you've never used Vim before but you've heard that it's a way to type less to
 Installation instructions
 -------------------------
 
-You can install the stable version of this plugin by downloading and double-clicking it.
+You can install the latest release of this plugin by [downloading](https://github.com/downloads/philc/textmatevim/TextMateVim-latest-release.zip) and double-clicking it.
 
 Alternatively, you can install it from source:
 
 1. Clone this git repo
 2. run `rake build` from within the git repo (you'll need the XCode Developer tools install for this)
-3. Copy or symlink `build/Debug/TextMateVim.bundle` into /Library/Application\ Support/TextMate/PlugIns/
+3. Copy or symlink `build/Debug/TextMateVim.bundle` into ~/Library/Application\ Support/TextMate/PlugIns/
 
 Basic Vim usage
 ---------------
