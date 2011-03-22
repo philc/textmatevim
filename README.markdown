@@ -77,7 +77,7 @@ You can define your own custom keybindings by creating a `.textmatevimrc` file i
       map "n", "move_down"
     end
 
-See default_config.rb for lots of hints and examples. Note that shifts are automatically detected: `<C-F>` is understood to be Ctrl+Shift+F.
+See default_config.rb for lots of hints and examples. Note that shifts are automatically detected: `<C-f>` is understood to be Ctrl+Shift+F.
 
 Tips
 ----
@@ -91,7 +91,7 @@ If there is an inconsistency with Vim that troubles you, feel free to file a bug
 
 When you're done hacking, send a pull request on Github. Feel free to include a change to the credits with your patch.
 
-Read DEVELOPERS.markdown for more information about hacking and debugging TextMateVim.
+Read [DEVELOPERS.markdown](https://github.com/philc/textmatevim/blob/master/DEVELOPERS.markdown) for more information about hacking and debugging TextMateVim.
 
 Release notes
 -------------
@@ -105,5 +105,5 @@ Copyright (c) 2011 Phil Crosby. Licensed under the [MIT license](http://www.open
 
 Credits
 -------
-Phil Crosby
-Kevin Fitzpatrick (who wrote VimMate, which inspired TextMateVim).
+    Phil Crosby (twitter @philcrosby)
+    Kevin Fitzpatrick (who wrote VimMate, which inspired TextMateVim).
