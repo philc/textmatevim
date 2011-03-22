@@ -41,8 +41,9 @@ desc "Produces a release bundle in build/release"
 task :release_bundle do
   $configuration = "Release"
   Rake::Task["build"].invoke
+  `rm -Rf build/release/#{APPNAME}.tmplugin`
   `mv "build/release/#{APPNAME}.bundle" "build/release/#{APPNAME}.tmplugin"`
-  `zip -r build/release/#{APPNAME}.tmbundle.zip build/release/#{APPNAME}.tmplugin`
+  `cd build/release; zip -r "#{APPNAME}.tmplugin.zip" "#{APPNAME}.tmplugin"`
 end
 
 def kill_process(name)
