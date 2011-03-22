@@ -10,6 +10,7 @@
 - (void)enterMode:(NSString *)mode;
 - (NSPoint)getScrollPosition:(NSView *)view;
 - (NSView *)oakTextView;
+- (NSPasteboard *)textMateVimPasteboard;
 - (void)copySelection;
 - (id)oakTabBarView;
 - (void)removeMenuItemShortcutsWhichMatch:(NSArray *)keybindings;
@@ -17,5 +18,6 @@
 - (void)previousTab;
 - (NSDictionary *)handleMessage:(NSDictionary *)message;
 - (NSDictionary *)hasSelection;
+- (NSDictionary *) getSelectedText;
 
 @end

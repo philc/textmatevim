@@ -93,7 +93,7 @@ module EditorCommands
   # Which end of the selection we're modifying first matters. After hitting undo, we want
   # the cursor to end up where it was prior to this command.
   def cut_word_forward()
-    select_word_forward_including_whitespace() * @number_prefix + ["copySelection", "deleteBackward:"] +
+    select_word_forward_including_whitespace(@number_prefix) + ["copySelection", "deleteBackward:"] +
         restore_cursor_position()
   end
 
@@ -215,12 +215,25 @@ module EditorCommands
   # commands, which heavily modify the cursor position when building up a selection to copy.
   def restore_cursor_position() set_cursor_position(@event["line"], @event["column"]) end
 
-  def select_word_forward_including_whitespace()
-    # Textmate does some smart selecting of whitespace depending on which direction you're moving
-    # between words. Leverage that behavior to select whitespace characters following a word in addition
-    # to that word. NOTE(philc): This should be made more robust. It doesn't handle runs of whitespace
-    # nor whitespace around arithmetic operators.
-    ["moveWordForwardAndModifySelection:"] * 2 + ["moveWordBackwardAndModifySelection:"]
+  def select_word_forward_including_whitespace(how_many_words)
+    how_many_words.times { send_message("moveWordForwardAndModifySelection:" => []) }
+    selection = send_message("getSelectedText" => [])["selectedText"]
+
+    # We're going to keep moving the cursor forward as long as it contains whitespace. Note that Textmate will move the
+    # cursor by two characters when moving through runs of whitespace, as if you're moving by tabs.
+    trailing_selection_is_whitespace = true
+    while trailing_selection_is_whitespace
+      send_message("moveForwardAndModifySelection:" => [])
+      trailing_selection = send_message("getSelectedText" => [])["selectedText"]
+      trailing_selection = trailing_selection[selection.size..-1] || ""
+      trailing_selection_is_whitespace = (trailing_selection =~ /^\s+$/)
+      if (!trailing_selection_is_whitespace && trailing_selection.size > 0)
+        # Undo the last "move forward" command we sent.
+        send_message("moveBackwardAndModifySelection:" => [])
+      end
+    end
+
+    []
   end
 
   # This is used for development. This will reload the Ruby parts of textmatevim in-process, without having

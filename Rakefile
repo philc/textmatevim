@@ -68,4 +68,6 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
     end
     result
   end
+
+  # This line ends in "quotes"
 EOF

@@ -105,7 +105,7 @@ static NSNumber * columnNumber;
   NSArray * arguments = [message objectForKey:command];
   
   NSArray * textMateVimWindowCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"copySelection", @"paste", @"hasSelection", @"selectNone",
+      @"enterMode:", @"addNewline", @"copySelection", @"paste", @"hasSelection", @"selectNone", @"getSelectedText",
       @"getClipboardContents", @"setClipboardContents:",
       @"scrollTo:", @"setSelection:column:", @"undo",
       @"nextTab", @"previousTab", nil];
@@ -157,6 +157,25 @@ static NSNumber * columnNumber;
   [self.oakTextView selectToLine:line andColumn:column];
 }
 
+- (void)copySelection {
+  [self.oakTextView writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
+      types:[NSArray arrayWithObject:@"NSStringPboardType"]];
+}
+
+/* Returns the contents of the current selection. */
+- (NSDictionary *)getSelectedText {
+  // We're using pasteboards to copy data around. I'm not sure if there's a better approach.
+  [self.oakTextView writeSelectionToPasteboard:self.textMateVimPasteboard
+      types:[NSArray arrayWithObject:@"NSStringPboardType"]];
+  NSString * selectedText = [self.textMateVimPasteboard stringForType:@"NSStringPboardType"];
+  return [NSDictionary dictionaryWithObjectsAndKeys: selectedText, @"selectedText", nil];
+}
+
+- (NSDictionary *)hasSelection {
+  NSNumber * hasSelection = [NSNumber numberWithBool:[self.oakTextView hasSelection]];
+  return [NSDictionary dictionaryWithObjectsAndKeys: hasSelection, @"hasSelection", nil];
+}
+
 /* Scrolls the OakTextView to the given Y coordinate. TODO(philc): Support X as well. */
 - (void)scrollTo:(NSNumber *)y {
   NSPoint scrollPosition = [self getScrollPosition:(NSView *)self.oakTextView];
@@ -186,16 +205,6 @@ static NSNumber * columnNumber;
   id tabBar = self.oakTabBarView;
   if (tabBar)
     [tabBar selectPreviousTab:nil];
-}
-
-- (void)copySelection {
-  [self.oakTextView writeSelectionToPasteboard:[NSPasteboard generalPasteboard]
-      types:[NSArray arrayWithObject:@"NSStringPboardType"]];
-}
-
-- (NSDictionary *)hasSelection {
-  NSNumber * hasSelection = [NSNumber numberWithBool:[self.oakTextView hasSelection]];
-  return [NSDictionary dictionaryWithObjectsAndKeys: hasSelection, @"hasSelection", nil];
 }
 
 /*
@@ -230,6 +239,9 @@ static NSNumber * columnNumber;
 
 /* OakTextView is TextMate's text editor implementation. */
 - (NSView *)oakTextView { return (NSView *)self.firstResponder; }
+
+/* A scratch pasteboard used for copying the current editor's selection and serializing it to a string. */
+- (NSPasteboard *)textMateVimPasteboard { return [NSPasteboard pasteboardWithName:@"textMateVimPasteboard"]; }
 
 /*
  * The TabBarView which controls the tabs for the current window. nil if only a single file is being edited.
