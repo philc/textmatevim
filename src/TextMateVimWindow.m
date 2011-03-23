@@ -12,6 +12,7 @@ static CommandModeCursor * cursorView;
 static NSString * currentMode;
 static NSNumber * lineNumber;
 static NSNumber * columnNumber;
+static NSDictionary * menuItemsByTitle;
 
 /*
  * We only want to intercept events for windows which contain the text editing view.
@@ -28,7 +29,9 @@ static NSNumber * columnNumber;
     firstTimeInitialization = true;
     NSDictionary * response = [TextMateVimPlugin sendEventRouterMessage:
         [NSDictionary dictionaryWithObjectsAndKeys: @"getKeybindings", @"message", nil]];
-    [self removeMenuItemShortcutsWhichMatch: [response objectForKey: @"keybindings"]];
+    NSArray * menuItems = [self menuItemsList];
+    [self removeMenuItemShortcutsWhichMatch: [response objectForKey: @"keybindings"] menuItems:menuItems];
+    menuItemsByTitle = [[self getMenuItemsByTitle:menuItems] retain];
   }
 
   if (currentWindow != nil) {
@@ -105,10 +108,10 @@ static NSNumber * columnNumber;
   NSArray * arguments = [message objectForKey:command];
   
   NSArray * textMateVimWindowCommands = [NSArray arrayWithObjects:
-      @"enterMode:", @"addNewline", @"copySelection", @"paste", @"hasSelection", @"selectNone", @"getSelectedText",
-      @"getClipboardContents", @"setClipboardContents:",
+      @"enterMode:", @"addNewline", @"copySelection", @"paste", @"hasSelection", @"selectNone",
+      @"getSelectedText", @"getClipboardContents", @"setClipboardContents:",
       @"scrollTo:", @"setSelection:column:", @"undo",
-      @"nextTab", @"previousTab", nil];
+      @"clickMenuItem:", nil];
 
   NSDictionary * result = NULL;
   if ([textMateVimWindowCommands containsObject:command]) {
@@ -234,6 +237,26 @@ static NSNumber * columnNumber;
   [columnNumber retain];
 }
 
+/*
+ * Given a menu item title, simulates clicking on that menu item. This is useful for leveraging the standard
+ * TextMate menu bar commands from TextMateVim commands.
+ */
+- (void)clickMenuItem:(NSString *)menuItemTitle {
+  NSMenuItem * menuItem = [menuItemsByTitle objectForKey: menuItemTitle];
+
+  NSLog(@"menu %@", menuItem.title);
+  if (menuItem) {
+    if (menuItem.isHiddenOrHasHiddenAncestor || !menuItem.isEnabled)
+      return;
+    NSLog(@"%@", @"performing selector...");
+    // menuItem.target is nil, so this will cause the message to be sent through the responder chain.
+    [menuItem.menu performActionForItemAtIndex:[menuItem.menu indexOfItemWithTitle:menuItem.title]];
+    // [self performSelector:menuItem.action withObject:nil];
+  } else {
+    NSLog(@"In clickMenuItem, could not find a menu item corresponding to %@", menuItemTitle);
+  }
+}
+
 /* For the given NSView, retrieves its scroll position. */
 - (NSPoint)getScrollPosition:(NSView *)view { return view.enclosingScrollView.documentVisibleRect.origin; }
 
@@ -266,13 +289,9 @@ static NSNumber * columnNumber;
   return nil;
 }
 
-/*
- * Given an array of shortcuts, iterates through all of the submenus in the app's menu bar and disables
- * shortcuts for those menu items which conflict. This is to ensure that TextMateVim's keybindings (in
- * particular CTRL+U) aren't swallowed by Textmate.
- * shortcuts should be an array of the form: [[key, modifier_flags], ...]
- */
-- (void)removeMenuItemShortcutsWhichMatch:(NSArray *)shortcuts {
+/* Returns a flattened list of the application's NSMenuItems. */
+- (NSArray *)menuItemsList {
+  NSMutableArray * menuItems = [NSMutableArray arrayWithCapacity:30];
   NSMutableArray * submenus = [NSMutableArray arrayWithCapacity:30];
   [submenus addObject:self.menu];
 
@@ -285,13 +304,49 @@ static NSNumber * columnNumber;
       NSMenuItem * menuItem = [submenu itemAtIndex:i];
       if (menuItem.submenu)
         [submenus addObject: menuItem.submenu];
-      for (int j = 0; j < shortcuts.count; j++) {
-        NSArray * keystroke = [shortcuts objectAtIndex:j];
-        if ([[keystroke objectAtIndex:0] isEqualToString:menuItem.keyEquivalent] &&
-            [[keystroke objectAtIndex:1] unsignedIntValue] == menuItem.keyEquivalentModifierMask) {
-          [menuItem setKeyEquivalent: @""];
-          break;
-        }
+      [menuItems addObject: menuItem];
+    }
+  }
+  return menuItems;
+}
+
+/*
+ * Returns a mapping from { "menu item title" => NSMenuItem }. Menu item titles are fully qualified where
+ * each level of the hierarchy is separated by " > ", e.g. "File > Save".
+ */
+- (NSDictionary *)getMenuItemsByTitle:(NSArray *)menuItems {
+  NSMutableDictionary * menuItemsByTitle = [NSMutableDictionary dictionaryWithCapacity: menuItems.count];
+  for (int i = 0; i < menuItems.count; i++) {
+    NSMenuItem * menuItem = [menuItems objectAtIndex:i];
+    [menuItemsByTitle setObject:menuItem forKey:[self fullyQualifiedMenuItemTitle:menuItem]];
+  }
+  return menuItemsByTitle;
+}
+
+- (NSString *)fullyQualifiedMenuItemTitle:(NSMenuItem *)menuItem {
+  NSMutableArray * title= [NSMutableArray arrayWithCapacity: 4];
+  while (menuItem) {
+    [title insertObject:menuItem.title atIndex:0];
+    menuItem = menuItem.parentItem;
+  }
+  return [title componentsJoinedByString: @" > "];
+}
+
+/*
+ * Given an array of shortcuts, iterates through all of the submenus in the app's menu bar and disables
+ * shortcuts for those menu items which conflict. This is to ensure that TextMateVim's keybindings (in
+ * particular CTRL+U) aren't swallowed by Textmate.
+ * - shortcuts: an array of the form: [[key, modifier_flags], ...]
+ */
+- (void)removeMenuItemShortcutsWhichMatch:(NSArray *)shortcuts menuItems:(NSArray *)menuItems {
+  for (int i = 0; i < menuItems.count; i++) {
+    NSMenuItem * menuItem = [menuItems objectAtIndex:i];
+    for (int j = 0; j < shortcuts.count; j++) {
+      NSArray * keystroke = [shortcuts objectAtIndex:j];
+      if ([[keystroke objectAtIndex:0] isEqualToString:menuItem.keyEquivalent] &&
+          [[keystroke objectAtIndex:1] unsignedIntValue] == menuItem.keyEquivalentModifierMask) {
+        [menuItem setKeyEquivalent: @""];
+        break;
       }
     }
   }

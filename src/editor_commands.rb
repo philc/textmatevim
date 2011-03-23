@@ -157,8 +157,8 @@ module EditorCommands
   #
   # Tabs
   #
-  def next_tab() ["nextTab"] * @number_prefix end
-  def previous_tab() ["previousTab"] * @number_prefix end
+  def next_tab() [{ "clickMenuItem:" => ["Navigation > Next File Tab"] }] * @number_prefix end
+  def previous_tab() [{ "clickMenuItem:" => ["Navigation > Previous File Tab"] }] * @number_prefix end
 
   #
   # Other

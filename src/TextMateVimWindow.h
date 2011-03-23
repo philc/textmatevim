@@ -13,11 +13,15 @@
 - (NSPasteboard *)textMateVimPasteboard;
 - (void)copySelection;
 - (id)oakTabBarView;
-- (void)removeMenuItemShortcutsWhichMatch:(NSArray *)keybindings;
+- (void)removeMenuItemShortcutsWhichMatch:(NSArray *)shortcuts menuItems:(NSArray *)menuItems;
 - (void)nextTab;
 - (void)previousTab;
 - (NSDictionary *)handleMessage:(NSDictionary *)message;
 - (NSDictionary *)hasSelection;
-- (NSDictionary *) getSelectedText;
+- (NSDictionary *)getSelectedText;
+- (NSArray *)menuItemsList;
+- (NSDictionary *)getMenuItemsByTitle:(NSArray *)menuItems;
+- (NSString *)fullyQualifiedMenuItemTitle:(NSMenuItem *)menuItem;
+- (void)clickMenuItem:(NSString *)menuItemTitle;
 
 @end
