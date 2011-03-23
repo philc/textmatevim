@@ -24,7 +24,7 @@ In visual mode, you can use the command mode shortcuts to select text.
 
 Keyboard bindings
 -----------------
-Modifier keys are specified as &lt;c-x&gt;, &lt;m-x&gt;, &lt;a-x&gt; for ctrl+x, meta+x, and alt+x
+Modifier keys are specified as &lt;C-x&gt;, &lt;M-x&gt;, &lt;A-x&gt; for CTRL+x, META+x, and ALT+x
 respectively. You can customize all of these.
 
 Switching modes
