@@ -18,14 +18,14 @@ Alternatively, you can install it from source:
 
 Basic Vim usage
 ---------------
-There are three modes: insert, command, and visual. In insert mode, you can type text as you normally would. Hit <esc> to enter command mode (your cursor will change appearance). In command mode, you can use the keybindings described below to quickly move about the document with very few keystrokes. Type `i` to enter insert mode again.
+There are three modes: insert, command, and visual. In insert mode, you can type text as you normally would. Hit &lt;esc&gt; to enter command mode (your cursor will change appearance). In command mode, you can use the keybindings described below to quickly move about the document with very few keystrokes. Type "i" to enter insert mode again.
 
 In visual mode, you can use the command mode shortcuts to select text.
 
 Keyboard bindings
 -----------------
-Modifier keys are specified as &lt;c-x&gt; &lt;m-x&gt;, &lt;a-x&gt; for ctrl+x, meta+x, and alt+x
-respectively. See the next section for instructions on modifying these bindings.
+Modifier keys are specified as &lt;c-x&gt;, &lt;m-x&gt;, &lt;a-x&gt; for ctrl+x, meta+x, and alt+x
+respectively. You can customize all of these.
 
 Switching modes
     Esc   enter Command Mode.
@@ -77,11 +77,11 @@ You can define your own custom keybindings by creating a `.textmatevimrc` file i
       map "n", "move_down"
     end
 
-See default_config.rb for lots of hints and examples. Note that shifts are automatically detected: `<C-f>` is understood to be Ctrl+Shift+F.
+See [default_config.rb](https://github.com/philc/textmatevim/blob/master/src/default_config.rb) for lots of hints and examples. Note that shifts are automatically detected: `<C-f>` is understood to be Ctrl+Shift+F.
 
 Tips
 ----
-* Prefer using "u" in command mode instead of CMD+Z to undo your edits. This is because when editing in command mode, TextMateVim saves the cursor position prior to the edit. TextMate's default undo system does not.
+* Prefer using "u" in command mode instead of CMD+Z to undo your edits. This is because when editing in command mode, TextMateVim saves the cursor position prior to the edit and will restore it when you use "u". TextMate's default undo system does not.
 
 Contributing
 ------------
@@ -101,7 +101,7 @@ Release notes
 
 License
 -------
-Copyright (c) 2011 Phil Crosby. Licensed under the [MIT license](http://www.opensource.org/licenses/mit-license.php)
+Copyright (c) 2011 Phil Crosby. Licensed under the [MIT license](http://www.opensource.org/licenses/mit-license.php).
 
 Credits
 -------
