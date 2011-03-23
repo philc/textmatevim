@@ -14,8 +14,6 @@ mode(:command, :visual) do
   map "o", "insert_newline_below"
 
   # Other
-  map "p", "paste_after"
-  map "P", "paste_before"
   map "u", "undo"
 end
 
@@ -65,6 +63,8 @@ mode(:command) do
   map "K", "next_tab"
 
   # Other
+  map "p", "paste_after"
+  map "P", "paste_before"
   map "<C-r>", "reload_textmatevim"
 end
 
@@ -93,6 +93,9 @@ mode(:visual) do
   map "dl", ["cut_forward", "enter_command_mode"]
 
   map "y", ["copy_selection", "enter_command_mode"]
+
+  map "p", ["paste_after", "enter_command_mode"]
+  map "P", ["paste_before", "enter_command_mode"]
 end
 
 mode(:insert) do
