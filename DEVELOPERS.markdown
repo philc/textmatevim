@@ -1,8 +1,8 @@
 Overview
 ========
-TextMateVim is composed of two parts. The first is a TextMate plugin written in Objective C. The second is an event handler written in Ruby. At a high level, the objective C plugin spawns the Ruby event handler as a child process and passes it keydown events. The Ruby event handler has all of the logic related to implementing user mappings.
+TextMateVim is composed of two parts. The first is a TextMate plugin written in Objective C. The second is an event handler written in Ruby. At a high level, the objective C plugin spawns the Ruby event handler as a child process and passes it keydown events. The Ruby event handler has all of the logic related to implementing users' key mappings.
 
-The rationale for this is that the Ruby side is far easier to change debug.
+The rationale for having the Ruby event handler is that the Ruby portion is far easier to change and debug, and can even be modified while TextMate is running.
 
 Building & Hacking
 ==================
@@ -10,9 +10,9 @@ To build the plugin, from the root of the project directory, run
 
     rake build
 
-The plugin will appear in `build/Debug/TextMateVim.bundle`. At this point you could copy or symlink that plugin into your `/Library/Application Support/TextMate/PlugIns` directory and start playing with it.
+The plugin will appear in `build/Debug/TextMateVim.bundle`. At this point you could copy or symlink the plugin into your `/Library/Application Support/TextMate/PlugIns` directory and start playing with it.
 
-However, the best and fastest way to hack on this plugin is to launch a second "developer" instance of TextMate, so that you don't jack up your primary TextMate environment while working on this plugin.
+However, the best and fastest way to hack on this plugin is to launch a second "developer" instance of TextMate, so that you don't jack up your primary TextMate environment while changing this plugin.
 
 To create a second developer copy of TextMate, perform these steps:
 
@@ -22,20 +22,18 @@ To create a second developer copy of TextMate, perform these steps:
 
 Now you can run two TextMates side-by-side, each with their own different bundles and plugins.
 
-To both build and load TextMateVim plugin into your Developer TextMate, run
+To both build and load the TextMateVim plugin into your Developer TextMate, run
 
     rake debug
 
 Tests
 =====
-For any large refactorings or non-trivial changes, leverage the unit tests. You can run them like this.
+For any large refactorings or non-trivial changes, leverage the unit tests. You can run them like this:
 
     rake test
 
 Coding style
 ============
-In brief:
-
  * Follow the style in the file you're editing.
  * Ensure your lines don't exceed 110 characters.
 
@@ -45,10 +43,11 @@ After browsing through the source code, you'll see that most of the modal editin
 
 Exploring Textmate's classes
 -----------------------------
-The best way to poke around with TextMate's classes is to use the FScript Injection service. It allows you to explore with a GUI at runtime the classes TextMate is using, and invoke methods on them. You can use a Firebug-style inspector to identify the various views which make up TextMate.
-http://pmougin.wordpress.com/2010/01/05/the-revenge-of-f-script-anywhere/
+The best way to poke around with TextMate's classes is to use the FScript Injection service. It allows you to explore with a GUI at runtime the classes TextMate is using, and invoke methods on them. You can use a Firebug-style inspector to identify the various views which make up TextMate. The most important is the primary text editing class, OakTextView. You'll see many references to this in the code.
+
+[http://pmougin.wordpress.com/2010/01/05/the-revenge-of-f-script-anywhere/](http://pmougin.wordpress.com/2010/01/05/the-revenge-of-f-script-anywhere/)
 
 
-Another way to explore classes is to perform a classdump of TextMate. I've found this less useful than using the FScript explorer. Here's an overview:
+Another way to explore classes is to perform a classdump of TextMate. I've found this less useful than using the FScript explorer. Here's an overview of how to do this:
 
-[[http://www.culater.net/wiki/moin.cgi/CocoaReverseEngineering]]
+[http://www.culater.net/wiki/moin.cgi/CocoaReverseEngineering](http://www.culater.net/wiki/moin.cgi/CocoaReverseEngineering)
