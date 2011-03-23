@@ -77,7 +77,7 @@ You can define your own custom keybindings by creating a `.textmatevimrc` file i
       map "n", "move_down"
     end
 
-See [default_config.rb](https://github.com/philc/textmatevim/blob/master/src/default_config.rb) for lots of hints and examples. Note that shifts are automatically detected: `<C-f>` is understood to be Ctrl+Shift+F.
+See [default_config.rb](https://github.com/philc/textmatevim/blob/master/src/default_config.rb) for lots of hints and examples. Note that shifts are automatically detected: `<C-F>` is understood to be Ctrl+Shift+f.
 
 Tips
 ----
