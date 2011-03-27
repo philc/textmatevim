@@ -57,6 +57,8 @@ mode(:command) do
   map "yh", "copy_backward"
   map "yw", "copy_word_forward"
   map "yb", "copy_word_backward"
+  map "y0", "copy_to_beginning_of_line"
+  map "y$", "copy_to_end_of_line"
 
   # Tabs
   map "J", "previous_tab"

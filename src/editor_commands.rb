@@ -154,6 +154,13 @@ module EditorCommands
     restore_cursor_position()
   end
 
+  def copy_to_beginning_of_line()
+    ["moveToBeginningOfLineAndModifySelection:", "copySelection"] + restore_cursor_position()
+  end
+
+  def copy_to_end_of_line()
+    ["moveToEndOfLineAndModifySelection:", "copySelection"] + restore_cursor_position()
+  end
   #
   # Tabs
   #
