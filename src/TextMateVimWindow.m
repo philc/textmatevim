@@ -69,6 +69,7 @@ static NSDictionary * menuItemsByTitle;
   if (self != currentWindow)
     [self setFocusedWindow:self];
 
+  NSPoint scrollPosition = [self getScrollPosition:self.oakTextView];
   NSDictionary * keydownMessageBody = [NSDictionary dictionaryWithObjectsAndKeys:
       @"keydown", @"message",
       event.charactersIgnoringModifiers, @"characters",
@@ -76,7 +77,8 @@ static NSDictionary * menuItemsByTitle;
       lineNumber, @"line",
       columnNumber, @"column",
       [NSNumber numberWithBool:[self.oakTextView hasSelection]], @"hasSelection",
-      [NSNumber numberWithFloat:[self getScrollPosition:self.oakTextView].y], @"scrollY",
+      [NSNumber numberWithFloat:scrollPosition.x], @"scrolly",
+      [NSNumber numberWithFloat:scrollPosition.y], @"scrollY",
       nil];
       
   NSDictionary * response = [TextMateVimPlugin sendEventRouterMessage: keydownMessageBody];
@@ -110,7 +112,7 @@ static NSDictionary * menuItemsByTitle;
   NSArray * textMateVimWindowCommands = [NSArray arrayWithObjects:
       @"enterMode:", @"addNewline", @"copySelection", @"paste", @"hasSelection", @"selectNone",
       @"getSelectedText", @"getClipboardContents", @"setClipboardContents:",
-      @"scrollTo:", @"setSelection:column:", @"undo",
+      @"scrollTo:y:", @"setSelection:column:", @"undo",
       @"clickMenuItem:", nil];
 
   NSDictionary * result = NULL;
@@ -180,7 +182,7 @@ static NSDictionary * menuItemsByTitle;
 }
 
 /* Scrolls the OakTextView to the given Y coordinate. TODO(philc): Support X as well. */
-- (void)scrollTo:(NSNumber *)y {
+- (void)scrollTo:(NSNumber *)x y:(NSNumber *)y {
   NSPoint scrollPosition = [self getScrollPosition:(NSView *)self.oakTextView];
   scrollPosition.y = y.floatValue;
   [self.oakTextView scrollPoint:scrollPosition];

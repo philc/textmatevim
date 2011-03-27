@@ -111,7 +111,7 @@ module EditorCommands
   end
 
   def cut_to_end_of_line()
-    ["moveToEndOfLineAndModifySelection:", "copySelection", "deleteBackward:"]
+    ["moveToEndOfLineAndModifySelection:", "copySelection", "deleteBackward:"] + restore_cursor_position()
   end
 
   #
@@ -208,7 +208,7 @@ module EditorCommands
     # position, so we must restore that scroll position.
     [{ "setSelection:column:" => [0, 0] }, "moveBackward:",
      { "setSelection:column:" => [line + 1, column + 1] }, "moveForward:",
-     { "scrollTo:" => [@event["scrollY"]] }]
+     { "scrollTo:y:" => [@event["scrollX"], @event["scrollY"]] }]
   end
 
   # Restores the cursor position to whatever it was when this command began executing. Useful for the copy
