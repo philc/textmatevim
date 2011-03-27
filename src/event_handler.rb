@@ -8,8 +8,8 @@
 
 ENABLE_DEBUG_LOGGING = false
 
-$LOAD_PATH.push(File.dirname(__FILE__) + "/")
-$LOAD_PATH.push(File.dirname(__FILE__) + "/lib/")
+$LOAD_PATH.push(File.expand_path(File.dirname(__FILE__) + "/"))
+$LOAD_PATH.push(File.expand_path(File.dirname(__FILE__) + "/lib/"))
 
 require "rubygems"
 require "keystroke"
@@ -50,8 +50,8 @@ class EventHandler
   def handle_message(message)
     message_json = JSON.parse(message)
     case message_json["message"]
-    when "keydown": handle_keydown_message(message_json)
-    when "getKeybindings": handle_get_keybindings_message
+    when "keydown" then handle_keydown_message(message_json)
+    when "getKeybindings" then handle_get_keybindings_message
     end
   end
 
