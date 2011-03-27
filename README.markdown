@@ -91,7 +91,7 @@ If there is an inconsistency with Vim that troubles you, feel free to file a bug
 
 When you're done hacking, send a pull request on Github. Feel free to include a change to the credits with your patch.
 
-Read [DEVELOPERS.markdown](https://github.com/philc/textmatevim/blob/master/DEVELOPERS.markdown) for more information about hacking and debugging TextMateVim.
+Read [DEVELOPERS.markdown](https://github.com/philc/textmatevim/blob/master/DEVELOPERS.markdown) for more information about hacking and debugging TextMateVim. There is a list of some bigger projects [on the wiki](https://github.com/philc/textmatevim/wiki).
 
 Release notes
 -------------
