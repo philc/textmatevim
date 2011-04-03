@@ -32,6 +32,9 @@ static FILE * eventRouterStdout;
   // We're using the Sparkle update framework.
   updater = [SUUpdater updaterForBundle:[NSBundle bundleWithIdentifier:@"textmatevim"]];
   [updater resetUpdateCycle];
+  // We implement "pathToRelaunchForUpdater":
+  [updater setDelegate:self];
+
   // Start checking right now for an update. This shouldn't be necessary according to the Sparkle docs, but
   // I could never get the "automatic update scheduling" logic of Sparkle to trigger an actual update check.
   [updater checkForUpdatesInBackground];
@@ -89,6 +92,19 @@ static FILE * eventRouterStdout;
   } else {
     return [[NSString stringWithUTF8String: response] JSONValue];
   }
+}
+
+/*
+ * This is a delegate method invoked by the Sparkle SUUpdater object. Usually it returns the path to this
+ * bundle, which will be run when textmate relaunches after our bundle has been updated. However, if we run
+ * our bundle item directly after an update, TextMate has trouble installing it. After the update, just run
+ * TextMate directly.
+ */
+- (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater {
+  // NOTE(philc): I'd like access to the TM_APP_PATH which you have when running a TextMate command;
+  // hardcoding for now. If this path is incorrect, all that happens is that TextMate doesn't relaunch when
+  // you click "Update and Relaunch" when prompted to update TextMateVim.
+  return @"/Applications/TextMate.app";
 }
 
 @end

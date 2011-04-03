@@ -8,7 +8,7 @@ If you've never used Vim before but you've heard that it's a way to type less to
 Installation instructions
 -------------------------
 
-You can install the latest release of this plugin by [downloading](https://github.com/downloads/philc/textmatevim/TextMateVim-0.1.tmplugin.zip) and double-clicking it.
+You can install the latest release of this plugin by [downloading](https://github.com/downloads/philc/textmatevim/TextMateVim-0.2.tmplugin.zip) and double-clicking it.
 
 Alternatively, you can install it from source:
 
