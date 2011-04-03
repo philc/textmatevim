@@ -21,6 +21,8 @@
 		6A3CD23C13315554001A7161 /* activesupport_json.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A3CD23B13315554001A7161 /* activesupport_json.rb */; };
 		6A709FCA13245B320064415D /* ui_helper.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A709FC913245B320064415D /* ui_helper.rb */; };
 		6A8618E81324CDD7001A5360 /* editor_commands.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A8618E71324CDD7001A5360 /* editor_commands.rb */; };
+		6AA7EFB51347A845005A3BC3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AA7EFB41347A845005A3BC3 /* Sparkle.framework */; };
+		6AA7EFD21347A99F005A3BC3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6AA7EFB41347A845005A3BC3 /* Sparkle.framework */; };
 		6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33E9131250B80029DE19 /* CommandModeCursor.m */; };
 		6ABA33EE131251490029DE19 /* NSColor_categories.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33ED131251490029DE19 /* NSColor_categories.m */; };
 		6ABE410D1313B263001CA6B4 /* default_config.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6ABE41081313B263001CA6B4 /* default_config.rb */; };
@@ -30,6 +32,19 @@
 		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
 		8D5B49A804867FD3000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8D5B49A704867FD3000E48DA /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6AA7EFD31347A9BD005A3BC3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				6AA7EFD21347A99F005A3BC3 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -56,6 +71,7 @@
 		6A3CD23B13315554001A7161 /* activesupport_json.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = activesupport_json.rb; path = lib/activesupport_json.rb; sourceTree = SOURCE_ROOT; };
 		6A709FC913245B320064415D /* ui_helper.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = ui_helper.rb; sourceTree = "<group>"; };
 		6A8618E71324CDD7001A5360 /* editor_commands.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = editor_commands.rb; sourceTree = "<group>"; };
+		6AA7EFB41347A845005A3BC3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = vendor/Sparkle.framework; sourceTree = "<group>"; };
 		6ABA33E8131250B80029DE19 /* CommandModeCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandModeCursor.h; path = src/CommandModeCursor.h; sourceTree = "<group>"; };
 		6ABA33E9131250B80029DE19 /* CommandModeCursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommandModeCursor.m; path = src/CommandModeCursor.m; sourceTree = "<group>"; };
 		6ABA33EC131251490029DE19 /* NSColor_categories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColor_categories.h; sourceTree = "<group>"; };
@@ -76,6 +92,7 @@
 				8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */,
 				0A77BE8F111FF5B2006F0625 /* Cocoa.framework in Frameworks */,
 				0A77BEB3111FFA4D006F0625 /* RubyCocoa.framework in Frameworks */,
+				6AA7EFB51347A845005A3BC3 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +113,7 @@
 		089C1671FE841209C02AAC07 /* External Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				6AA7EFB41347A845005A3BC3 /* Sparkle.framework */,
 				0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */,
 				0A77BE8E111FF5B2006F0625 /* Cocoa.framework */,
 				0A77BEB2111FFA4D006F0625 /* RubyCocoa.framework */,
@@ -190,6 +208,7 @@
 				8D57630F048677EA00EA77CD /* Resources */,
 				8D576311048677EA00EA77CD /* Sources */,
 				8D576313048677EA00EA77CD /* Frameworks */,
+				6AA7EFD31347A9BD005A3BC3 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -281,6 +300,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/vendor\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -297,6 +321,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/vendor\"",
+				);
 				GCC_MODEL_TUNING = G5;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Bundles";

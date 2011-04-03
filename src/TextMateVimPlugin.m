@@ -8,6 +8,8 @@
  */
 @implementation TextMateVimPlugin
 
+@synthesize updater;
+
 int MAX_JSON_MESSAGE_SIZE = 8096;
 
 // Pipes to the Ruby event router process.
@@ -18,10 +20,21 @@ static FILE * eventRouterStdout;
   int pid = [TextMateVimPlugin startEventRouter];
   NSLog(@"TextMateVim has arrived. The ruby coprocess ID: %i", pid);
 
+  [self checkForNewerVersions];
+
   // "poseAsClass" has been deprecated, but it still works. Use performSelector to avoid compiler
   // warnings and errors.
   [TextMateVimWindow performSelector: NSSelectorFromString(@"poseAsClass:") withObject: [NSWindow class]];
   return [super init];
+}
+
+- (void)checkForNewerVersions {
+  // We're using the Sparkle update framework.
+  updater = [SUUpdater updaterForBundle:[NSBundle bundleWithIdentifier:@"textmatevim"]];
+  [updater resetUpdateCycle];
+  // Start checking right now for an update. This shouldn't be necessary according to the Sparkle docs, but
+  // I could never get the "automatic update scheduling" logic of Sparkle to trigger an actual update check.
+  [updater checkForUpdatesInBackground];
 }
 
 /*
