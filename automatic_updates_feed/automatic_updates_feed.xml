@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"
+  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>TextMateVim Changelog</title>
+      <link>https://github.com/philc/sparkletest/raw/master/updates.xml</link>
+      <description>Most recent changes.</description>
+      <language>en</language>
+         <item>
+            <title>Version 0.2</title>
+            <description>
+              <![CDATA[
+              <li>TextMateVim now checks automatically for new versions.</li>
+              <li>Added support for systems running Ruby 1.9.</li>
+              <li>Added y0 and y$ (copy to the beginning or end of line).</li>
+              <li>Tab switching (shift+J and shift+K) now works reliably.</li>
+              <li>Bugfixes.</li>
+              ]]>
+            </description>
+            <pubDate>Sun, 03 April 2011 01:34:43 +0000</pubDate>
+            <enclosure url="https://github.com/downloads/philc/textmatevim/TextMateVim-0.2.tmplugin.zip"
+              sparkle:version="0.2" length="1262701" type="application/octet-stream" />
+         </item>
+   </channel>
+</rss>
