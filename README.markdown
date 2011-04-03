@@ -95,6 +95,14 @@ Read [DEVELOPERS.markdown](https://github.com/philc/textmatevim/blob/master/DEVE
 
 Release notes
 -------------
+0.2 (April 2, 2011)
+
+ - TextMateVim now checks automatically for new versions.
+ - Added support for systems running Ruby 1.9.
+ - Added y0 and y$ (copy to the beginning or end of line).
+ - Tab switching (shift+J and shift+K) now works reliably.
+ - Bugfixes.
+
 0.1 (March 24, 2011)
 
  - Initial release.
