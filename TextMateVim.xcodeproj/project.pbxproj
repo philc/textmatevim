@@ -21,6 +21,7 @@
 		6A3CD23C13315554001A7161 /* activesupport_json.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A3CD23B13315554001A7161 /* activesupport_json.rb */; };
 		6A709FCA13245B320064415D /* ui_helper.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A709FC913245B320064415D /* ui_helper.rb */; };
 		6A8618E81324CDD7001A5360 /* editor_commands.rb in Resources */ = {isa = PBXBuildFile; fileRef = 6A8618E71324CDD7001A5360 /* editor_commands.rb */; };
+		6A9D116D1348027700CBF6AE /* textmate_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6A9D116C1348027700CBF6AE /* textmate_icon.png */; };
 		6AA7EFB51347A845005A3BC3 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6AA7EFB41347A845005A3BC3 /* Sparkle.framework */; };
 		6AA7EFD21347A99F005A3BC3 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6AA7EFB41347A845005A3BC3 /* Sparkle.framework */; };
 		6ABA33EA131250B80029DE19 /* CommandModeCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ABA33E9131250B80029DE19 /* CommandModeCursor.m */; };
@@ -71,6 +72,7 @@
 		6A3CD23B13315554001A7161 /* activesupport_json.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; name = activesupport_json.rb; path = lib/activesupport_json.rb; sourceTree = SOURCE_ROOT; };
 		6A709FC913245B320064415D /* ui_helper.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = ui_helper.rb; sourceTree = "<group>"; };
 		6A8618E71324CDD7001A5360 /* editor_commands.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = editor_commands.rb; sourceTree = "<group>"; };
+		6A9D116C1348027700CBF6AE /* textmate_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = textmate_icon.png; path = resources/textmate_icon.png; sourceTree = "<group>"; };
 		6AA7EFB41347A845005A3BC3 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = vendor/Sparkle.framework; sourceTree = "<group>"; };
 		6ABA33E8131250B80029DE19 /* CommandModeCursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandModeCursor.h; path = src/CommandModeCursor.h; sourceTree = "<group>"; };
 		6ABA33E9131250B80029DE19 /* CommandModeCursor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommandModeCursor.m; path = src/CommandModeCursor.m; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6A9D116C1348027700CBF6AE /* textmate_icon.png */,
 				6ABE41051313B263001CA6B4 /* src */,
 				8D576317048677EA00EA77CD /* Info.plist */,
 				8D5B49A704867FD3000E48DA /* InfoPlist.strings */,
@@ -259,6 +262,7 @@
 				6A3CD2361330A6EA001A7161 /* json_implementation.rb in Resources */,
 				6A3CD23C13315554001A7161 /* activesupport_json.rb in Resources */,
 				6A36EFC7133289ED00F9CC6D /* google_analytics.rb in Resources */,
+				6A9D116D1348027700CBF6AE /* textmate_icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
